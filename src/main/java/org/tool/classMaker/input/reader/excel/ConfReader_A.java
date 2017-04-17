@@ -5,7 +5,6 @@ import java.util.List;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.tool.classMaker.Utils;
-import org.tool.classMaker.input.reader.ExcelReader;
 import org.tool.classMaker.input.struct.CMClass;
 import org.tool.classMaker.input.struct.CMField;
 import org.tool.classMaker.input.struct.CMInterface;
@@ -29,9 +28,12 @@ public final class ConfReader_A extends ExcelReader {
 	}
 	
 	public ConfReader_A(String config) throws Exception {
-		this((IExcelLoaderCreator) Class.forName(config.split(";")[0]).newInstance(), 
-				config.split(";").length > 1 && config.split(";")[1].toLowerCase().equals("true"), 
-				config.split(";").length > 2 && config.split(";")[2].toLowerCase().equals("true"));
+		this(config.split(";"));
+	}
+	
+	private ConfReader_A(String[] configs) throws Exception {
+		super(configs);
+		supportInfoSheet = configs.length > 2 && configs[2].toLowerCase().equals("true");
 	}
 
 	@Override
