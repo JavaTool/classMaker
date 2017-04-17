@@ -1,13 +1,13 @@
 package org.tool.classMaker.struct;
 
-import java.util.List;
+import java.util.Map;
 
 public interface IClasses {
 	
-	List<IInterface> getInterfaces();
+	Map<String, IInterface> getInterfaces();
 	
-	List<IClass> getClasses();
+	Map<String, IClass> getClasses();
 	
-	List<IEnum> getEnums();
+	Map<String, IEnum> getEnums();
 
 }

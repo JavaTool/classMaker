@@ -2,7 +2,6 @@ package org.tool.classMaker.output;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.util.List;
 
 import org.tool.classMaker.generator.IGenerator;
 import org.tool.classMaker.generator.IGeneratorFactory;
@@ -23,12 +22,12 @@ public final class Output {
 		File dir = new File(outputDir);
 		Preconditions.checkArgument(dir.exists(), outputDir + " not exists.");
 		Preconditions.checkArgument(dir.isDirectory(), outputDir + " is not a dir.");
-		output(generatorFactory.createInterfaceGenerator(), classes.getInterfaces(), dir);
-		output(generatorFactory.createClassGenerator(), classes.getClasses(), dir);
-		output(generatorFactory.createEnumGenerator(), classes.getEnums(), dir);
+		output(generatorFactory.createInterfaceGenerator(), classes.getInterfaces().values(), dir);
+		output(generatorFactory.createClassGenerator(), classes.getClasses().values(), dir);
+		output(generatorFactory.createEnumGenerator(), classes.getEnums().values(), dir);
 	}
 	
-	private <T extends IInterface> void output(IGenerator<T> generator, List<T> list, File dir) throws Exception {
+	private <T extends IInterface> void output(IGenerator<T> generator, Iterable<T> list, File dir) throws Exception {
 		for (T t : list) {
 			output(generator.generate(t, ""), createFile(dir, t));
 		}

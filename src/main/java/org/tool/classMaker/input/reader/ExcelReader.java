@@ -31,11 +31,11 @@ public abstract class ExcelReader implements IReader {
 		Workbook workbook = excelLoaderCreator.load(inputStream);
 		IClasses classes = new CMClasses();
 		for (int i = 0;i < (readAll ? 1 : workbook.getNumberOfSheets());i++) {
-			read(classes, workbook.getSheetAt(i), _package);
+			read(classes, workbook.getSheetAt(i), _package, i);
 		}
 		return classes;
 	}
 	
-	protected abstract void read(IClasses classes, Sheet sheet, String _package) throws Exception;
+	protected abstract void read(IClasses classes, Sheet sheet, String _package, int index) throws Exception;
 
 }

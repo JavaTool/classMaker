@@ -1,49 +1,49 @@
 package org.tool.classMaker.input.struct;
 
-import java.util.List;
+import java.util.Map;
 
 import org.tool.classMaker.struct.IClass;
 import org.tool.classMaker.struct.IClasses;
 import org.tool.classMaker.struct.IEnum;
 import org.tool.classMaker.struct.IInterface;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 public final class CMClasses implements IClasses {
 	
-	private List<IInterface> interfaces;
+	private Map<String, IInterface> interfaces;
 	
-	private List<IClass> classes;
+	private Map<String, IClass> classes;
 	
-	private List<IEnum> enums;
+	private Map<String, IEnum> enums;
 	
 	public CMClasses() {
-		interfaces = Lists.newLinkedList();
-		classes = Lists.newLinkedList();
-		enums = Lists.newLinkedList();
+		interfaces = Maps.newHashMap();
+		classes = Maps.newHashMap();
+		enums = Maps.newHashMap();
 	}
 
-	public List<IInterface> getInterfaces() {
+	public Map<String, IInterface> getInterfaces() {
 		return interfaces;
 	}
 
-	public List<IClass> getClasses() {
+	public Map<String, IClass> getClasses() {
 		return classes;
 	}
 
-	public List<IEnum> getEnums() {
+	public Map<String, IEnum> getEnums() {
 		return enums;
 	}
 
-	public void setInterfaces(List<IInterface> interfaces) {
+	public void setInterfaces(Map<String, IInterface> interfaces) {
 		this.interfaces = interfaces;
 	}
 
-	public void setClasses(List<IClass> classes) {
+	public void setClasses(Map<String, IClass> classes) {
 		this.classes = classes;
 	}
 
-	public void setEnums(List<IEnum> enums) {
+	public void setEnums(Map<String, IEnum> enums) {
 		this.enums = enums;
 	}
 
