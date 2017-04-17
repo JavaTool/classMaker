@@ -20,6 +20,8 @@ public final class JsonReader extends LineReader {
 	public static final String VALUE_TYPE_CLASS = "class";
 	
 	public static final String VALUE_TYPE_ENUM = "enum";
+	
+	public JsonReader(String config) {}
 
 	@Override
 	public void setPackage(String _package) {}
@@ -28,17 +30,19 @@ public final class JsonReader extends LineReader {
 	protected void read(IClasses classes, String line) throws Exception {
 		JSONObject json = JSONObject.parseObject(line);
 		String type = json.getString(KEY_TYPE);
+		json.remove(KEY_TYPE);
+		String text = json.toJSONString();
 		switch (type) {
 		case VALUE_TYPE_INTERFACE : 
-			IInterface inter = JSONObject.parseObject(line, CMInterface.class);
+			IInterface inter = JSONObject.parseObject(text, CMInterface.class);
 			classes.getInterfaces().put(inter.getName(), inter);
 			break;
 		case VALUE_TYPE_CLASS : 
-			IClass clz = JSONObject.parseObject(line, CMClass.class);
+			IClass clz = JSONObject.parseObject(text, CMClass.class);
 			classes.getInterfaces().put(clz.getName(), clz);
 			break;
 		case VALUE_TYPE_ENUM : 
-			IEnum enu = JSONObject.parseObject(line, CMEnum.class);
+			IEnum enu = JSONObject.parseObject(text, CMEnum.class);
 			classes.getInterfaces().put(enu.getName(), enu);
 			break;
 		default : 
