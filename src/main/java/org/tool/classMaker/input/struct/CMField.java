@@ -60,4 +60,8 @@ public final class CMField extends CMBase implements IField {
 		this.needSetter = needSetter;
 	}
 
+	public void setTransient(boolean isTransient) {
+		this.isTransient = isTransient;
+	}
+
 }

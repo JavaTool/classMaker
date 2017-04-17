@@ -8,9 +8,10 @@ import org.tool.classMaker.maker.Maker;
 final class ClassMaker {
 	
 	private static final String[] DEFAULT_ARGS = new String[] {
-			"D:/Test.xlsx", // url
+			"D:/Test1.xlsx", // url
 			"org.tool.classMaker.generator.simple.GeneratorFactory", // factory
-			"org.tool.classMaker.input.reader.excel.ConfReader_A:org.tool.classMaker.input.reader.excel.XLSXCreator;true", // reader
+//			"org.tool.classMaker.input.reader.excel.ConfReader_A:org.tool.classMaker.input.reader.excel.XLSXCreator;false", // reader
+			"org.tool.classMaker.input.reader.excel.BeanReader_A:org.tool.classMaker.input.reader.excel.XLSXCreator", // reader
 			"D:/My_space/classMaker/src/main/java/", // output dir
 			"org.tool.classMaker.test" // package
 	};

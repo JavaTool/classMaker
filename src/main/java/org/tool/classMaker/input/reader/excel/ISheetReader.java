@@ -5,6 +5,6 @@ import org.tool.classMaker.struct.IClasses;
 
 interface ISheetReader {
 	
-	void read(IClasses classes, Sheet sheet, int index) throws Exception;
+	void read(IClasses classes, Sheet sheet) throws Exception;
 
 }

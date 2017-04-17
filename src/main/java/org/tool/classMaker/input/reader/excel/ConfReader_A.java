@@ -38,7 +38,7 @@ public final class ConfReader_A extends ExcelReader {
 
 	@Override
 	protected void read(IClasses classes, Sheet sheet, String _package, int index) throws Exception {
-		(index == 0 && supportInfoSheet ? new SheetReader_A_Info(_package) : new SheetReader_A_Class(_package)).read(classes, sheet, index);
+		(index == 0 && supportInfoSheet ? new SheetReader_A_Info(_package) : new SheetReader_A_Class(_package)).read(classes, sheet);
 	}
 	
 	static String makeInterfaceName(String name) {
@@ -56,7 +56,7 @@ final class SheetReader_A_Info implements ISheetReader {
 	}
 
 	@Override
-	public void read(IClasses classes, Sheet sheet, int index) throws Exception {
+	public void read(IClasses classes, Sheet sheet) throws Exception {
 		int oount = sheet.getLastRowNum();
 		for (int i = 1;i <= oount;i++) {
 			Row row = sheet.getRow(i);
@@ -74,7 +74,7 @@ final class SheetReader_A_Info implements ISheetReader {
 			clz.setNote(note);
 			clz.setSupper(createCMClass(Utils.splitPackage(supper)[0], 0, Utils.splitPackage(supper)[1]));
 			List<String> annotationList = Lists.newArrayList(annotations);
-			clz.setAnnotation(annotationList);
+			clz.setAnnotations(annotationList);
 			List<IInterface> interfaceList = Lists.newArrayList(new IInterface[]{inter});
 			for (String in : interfaces) {
 				interfaceList.add(createCMInterface(Utils.splitPackage(in)[0], 0, Utils.splitPackage(in)[1]));
@@ -111,7 +111,7 @@ final class SheetReader_A_Class implements ISheetReader {
 	}
 
 	@Override
-	public void read(IClasses classes, Sheet sheet, int index) throws Exception {
+	public void read(IClasses classes, Sheet sheet) throws Exception {
 		Row cnRow = sheet.getRow(0);
 		Row enRow = sheet.getRow(1);
 		Row typeRow = sheet.getRow(2);
@@ -152,7 +152,7 @@ final class SheetReader_A_Class implements ISheetReader {
 		field.setNeedGetter(true);
 		field.setNeedSetter(true);
 		List<String> annotations = ImmutableList.of();
-		field.setAnnotation(annotations);
+		field.setAnnotations(annotations);
 		field.setName(enRow.getCell(i).getStringCellValue());
 		field.setNote(cnRow.getCell(i).getStringCellValue());
 		field.setType(typeRow.getCell(i).getStringCellValue());

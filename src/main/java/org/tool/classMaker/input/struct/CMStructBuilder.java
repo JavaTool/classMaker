@@ -17,7 +17,7 @@ public final class CMStructBuilder {
 		CMInterface cmInterface = new CMInterface();
 		cmInterface.setAccess(Access.PUBLIC);
 		List<String> annotations = ImmutableList.of();
-		cmInterface.setAnnotation(annotations);
+		cmInterface.setAnnotations(annotations);
 		List<IField> fields = ImmutableList.of();
 		cmInterface.setFields(fields);
 		cmInterface.setFinal(false);
@@ -27,7 +27,7 @@ public final class CMStructBuilder {
 		cmInterface.setInnerClasses(innerClasses);
 		List<IMethod> methods = Lists.newArrayListWithCapacity(methodCount);
 		cmInterface.setMethods(methods);
-		List<IInterface> interfaces = ImmutableList.of();
+		List<IInterface> interfaces = Lists.newLinkedList();
 		cmInterface.setInterfaces(interfaces);
 		cmInterface.setPackage("");
 		return cmInterface;
@@ -37,16 +37,16 @@ public final class CMStructBuilder {
 		CMClass clz = new CMClass();
 		clz.setAccess(Access.PUBLIC);
 		List<String> annotations = ImmutableList.of();
-		clz.setAnnotation(annotations);
+		clz.setAnnotations(annotations);
 		List<IField> fields = Lists.newArrayListWithCapacity(fieldCount);
 		clz.setFields(fields);
-		List<IInterface> innerClasses = ImmutableList.of();
+		List<IInterface> innerClasses = Lists.newLinkedList();
 		clz.setInnerClasses(innerClasses);
 		List<IMethod> methods = Lists.newArrayListWithCapacity(methodCount);
 		clz.setMethods(methods);
 		clz.setFinal(false);
 		clz.setStatic(false);
-		List<IInterface> interfaces = ImmutableList.of();
+		List<IInterface> interfaces = Lists.newLinkedList();
 		clz.setInterfaces(interfaces);
 		clz.setImportGroup(new CMImportGroup());
 		clz.setPackage("");
@@ -94,8 +94,8 @@ public final class CMStructBuilder {
 		method.setStatic(false);
 		method.setInterface(false);
 		method.setSynchronized(false);
-		List<String> annotations = ImmutableList.of();
-		method.setAnnotation(annotations);
+		List<String> annotations = Lists.newLinkedList();
+		method.setAnnotations(annotations);
 		List<IField> exceptions = ImmutableList.of();
 		method.setExceptions(exceptions);
 		return method;

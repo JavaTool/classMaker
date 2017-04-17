@@ -51,7 +51,7 @@ public abstract class CMBase implements IBase {
 		this.note = note;
 	}
 
-	public void setAnnotation(List<String> annotations) {
+	public void setAnnotations(List<String> annotations) {
 		this.annotations = annotations;
 	}
 
