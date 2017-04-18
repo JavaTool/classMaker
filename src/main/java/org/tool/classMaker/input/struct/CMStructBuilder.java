@@ -96,9 +96,18 @@ public final class CMStructBuilder {
 		method.setSynchronized(false);
 		List<String> annotations = Lists.newLinkedList();
 		method.setAnnotations(annotations);
-		List<IField> exceptions = ImmutableList.of();
+		List<IField> exceptions = Lists.newLinkedList();
 		method.setExceptions(exceptions);
+		List<IField> params = Lists.newLinkedList();
+		method.setParams(params);
 		return method;
+	}
+	
+	public static CMField createMethodParam(String name, String type) {
+		CMField field = new CMField();
+		field.setName(name);
+		field.setType(type);
+		return field;
 	}
 
 }

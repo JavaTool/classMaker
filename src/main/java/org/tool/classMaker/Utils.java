@@ -18,6 +18,19 @@ public class Utils {
 		return ret;
 	}
 	
+	public static String _ToUppercase(String info) {
+		StringBuilder builder = new StringBuilder();
+		String[] infos = info.split("_");
+		if (infos.length > 1) {
+			for (String str : infos) {
+				builder.append(firstUpper(str.toLowerCase()));
+			}
+			return builder.toString();
+		} else {
+			return firstUpper(info.toLowerCase());
+		}
+	}
+	
 	public static void main(String[] args) {
 		System.out.println(splitPackage("org.tool.classMaker.Utils")[0]);
 		System.out.println(splitPackage("org.tool.classMaker.Utils")[1]);
