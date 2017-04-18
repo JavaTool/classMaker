@@ -1,4 +1,4 @@
-package org.tool.classMaker.generator.simple;
+package org.tool.classMaker.generator.java;
 
 import org.tool.classMaker.generator.IGenerator;
 import org.tool.classMaker.generator.IGeneratorFactory;
