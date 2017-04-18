@@ -1,0 +1,80 @@
+<assembly
+	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+	<id>release</id>
+	<formats>
+		<format>dir</format>
+	</formats>
+
+	<fileSets>
+		<fileSet>
+			<directory>${project.basedir}\propertiesconfig</directory>
+			<outputDirectory>propertiesconfig</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${project.basedir}\moduleprotoJson</directory>
+			<outputDirectory>moduleprotoJson</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${project.basedir}\moduleVersion</directory>
+			<outputDirectory>moduleVersion</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${project.basedir}\file</directory>
+			<outputDirectory>file</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${project.basedir}\config</directory>
+			<outputDirectory>config</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${project.basedir}\createfile</directory>
+			<outputDirectory>createfile</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${project.basedir}\compare</directory>
+			<outputDirectory>compare</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${project.basedir}\resource</directory>
+			<outputDirectory>resource</outputDirectory>
+		</fileSet>
+		
+		<fileSet>
+			<directory>${project.basedir}\target\classes</directory>
+			<outputDirectory>\</outputDirectory>
+			<includes>
+				<include>*.class</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>${project.basedir}\run</directory>
+			<outputDirectory>\</outputDirectory>
+			<includes>
+				<include>*.sh</include>
+				<include>*.bat</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>${project.basedir}\WebContent</directory>
+			<outputDirectory>\WebContent\</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${project.basedir}\run</directory>
+			<outputDirectory>\logs\</outputDirectory>
+			<excludes>
+				<exclude>*.sh</exclude>
+				<exclude>*.bat</exclude>
+			</excludes>
+		</fileSet>
+	</fileSets>
+
+	<dependencySets>
+		<dependencySet>
+			<useProjectArtifact>true</useProjectArtifact>
+			<outputDirectory>lib</outputDirectory><!-- 将scope为runtime的依赖包打包到lib目录下。 -->
+			<scope>runtime</scope>
+		</dependencySet>
+	</dependencySets>
+</assembly>
