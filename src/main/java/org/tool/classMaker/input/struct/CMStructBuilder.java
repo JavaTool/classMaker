@@ -100,6 +100,8 @@ public final class CMStructBuilder {
 		method.setExceptions(exceptions);
 		List<IField> params = Lists.newLinkedList();
 		method.setParams(params);
+		List<String> contents = Lists.newLinkedList();
+		method.setContents(contents);
 		return method;
 	}
 	

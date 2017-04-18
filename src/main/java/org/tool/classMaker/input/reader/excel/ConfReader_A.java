@@ -72,7 +72,7 @@ final class SheetReader_A_Info implements ISheetReader {
 			
 			CMClass clz = createCMClass(name, 0, _package);
 			clz.setNote(note);
-			clz.setSupper(createCMClass(Utils.splitPackage(supper)[0], 0, Utils.splitPackage(supper)[1]));
+			clz.setSuper(createCMClass(Utils.splitPackage(supper)[0], 0, Utils.splitPackage(supper)[1]));
 			List<String> annotationList = Lists.newArrayList(annotations);
 			clz.setAnnotations(annotationList);
 			List<IInterface> interfaceList = Lists.newArrayList(new IInterface[]{inter});

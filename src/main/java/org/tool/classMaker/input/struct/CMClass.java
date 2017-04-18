@@ -4,14 +4,14 @@ import org.tool.classMaker.struct.IClass;
 
 public final class CMClass extends CMInterface implements IClass {
 	
-	private IClass supper;
+	private IClass _super;
 
 	public IClass getSupper() {
-		return supper;
+		return _super;
 	}
 
-	public void setSupper(IClass supper) {
-		this.supper = supper;
+	public void setSuper(IClass _super) {
+		this._super = _super;
 	}
 
 }

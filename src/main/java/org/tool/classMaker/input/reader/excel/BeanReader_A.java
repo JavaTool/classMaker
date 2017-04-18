@@ -174,7 +174,7 @@ final class BeanSheetReader extends BaseBeanSheetReader {
 			clz.setNote(row.getCell(1).getStringCellValue());
 			if (row.getCell(2) != null) {
 				String supper = row.getCell(2).getStringCellValue();
-				clz.setSupper(createCMClass(Utils.splitPackage(supper)[0], 0, Utils.splitPackage(supper)[1]));
+				clz.setSuper(createCMClass(Utils.splitPackage(supper)[0], 0, Utils.splitPackage(supper)[1]));
 			}
 			clz.setStatic(row.getCell(6).getBooleanCellValue());
 			if (row.getCell(4) != null) {

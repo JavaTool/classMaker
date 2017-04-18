@@ -8,12 +8,13 @@ import org.tool.classMaker.maker.Maker;
 final class ClassMaker {
 	
 	private static final String[] DEFAULT_ARGS = new String[] {
-			"D:/Test1.xlsx", // url
-			"org.tool.classMaker.generator.simple.GeneratorFactory", // factory
+			"D:/My_space/CrossGateProject/program/proto/proto_src/Account.proto", // url
+			"org.tool.classMaker.generator.java.GeneratorFactory", // factory
 //			"org.tool.classMaker.input.reader.excel.ConfReader_A:org.tool.classMaker.input.reader.excel.XLSXCreator;false", // reader
-			"org.tool.classMaker.input.reader.excel.BeanReader_A:org.tool.classMaker.input.reader.excel.XLSXCreator", // reader
-			"D:/My_space/classMaker/src/main/java/", // output dir
-			"org.tool.classMaker.test" // package
+//			"org.tool.classMaker.input.reader.excel.BeanReader_A:org.tool.classMaker.input.reader.excel.XLSXCreator", // reader
+			"org.tool.classMaker.input.reader.proto.ProtoReader_A:a", // reader
+			"D:/My_space/CrossGateBase/src/", // output dir
+			"cg.base.io.newMessage" // package
 	};
 
 	public static void main(String[] args) {

@@ -12,9 +12,11 @@ import org.tool.classMaker.struct.Access;
 import org.tool.classMaker.struct.IClasses;
 import org.tool.classMaker.struct.IField;
 
+import com.google.common.collect.Lists;
+
 class ClassCreator extends TypeCreator<CMClass> {
 	
-	private static final CMClass SUPPER = createMessageSupper();
+	private static final CMClass SUPER = createMessageSupper();
 
 	@Override
 	public CMClass create(IClasses classes, String name, String _package, List<String> structLines) {
@@ -24,26 +26,56 @@ class ClassCreator extends TypeCreator<CMClass> {
 		cmClass.setName(className);
 		cmClass.setPackage(_package);
 		cmClass.getFields().add(createBuilderField(name));
-		cmClass.setSupper(SUPPER);
+		cmClass.setSuper(SUPER);
 		cmClass.getMethods().add(createConstructor1(name, className));
 		cmClass.getMethods().add(createConstructor2(name, className));
 		cmClass.getMethods().add(createBuildMethod(name));
 		cmClass.getMethods().add(createToByteArrayMethod());
 		for (String line : structLines) {
 			IField field = createLineField(line);
-			cmClass.getMethods().add(CMStructBuilder.createGetter(field));
-			cmClass.getMethods().add(CMStructBuilder.createSetter(field));
+			cmClass.getMethods().add(createGetter(field));
+			cmClass.getMethods().add(createSetter(field));
 		}
 		classes.getClasses().put(name, cmClass);
 		return cmClass;
+	}
+	
+	private static CMMethod createGetter(IField field) {
+		CMMethod method = CMStructBuilder.createGetter(field);
+		method.getContents().clear();
+		method.getContents().add("return builder." + method.getName() + "();");
+		return method;
+	}
+	
+	private static CMMethod createSetter(IField field) {
+		CMMethod method = CMStructBuilder.createSetter(field);
+		method.getContents().clear();
+		method.getContents().add("builder." + method.getName() + "(" + field.getName() + ");");
+		return method;
 	}
 	
 	private static IField createLineField(String line) {
 		String[] infos = line.split("=")[0].replaceAll("\t", "").split(" ");
 		CMField field = new CMField();
 		field.setName(infos[2]);
-		field.setType(infos[0].equals("repeated") ? "java.util.List<" + infos[1] + ">" : infos[1]);
+		String type = transformJavaType(infos[1]);
+		field.setType(infos[0].equals("repeated") ? "java.util.List<" + type + ">" : type);
 		return field;
+	}
+	
+	private static String transformJavaType(String protoType) {
+		switch (protoType) {
+		case "string" : 
+			return "String";
+		case "int32" : 
+			return "int";
+		case "int64" : 
+			return "long";
+		case "bool" : 
+			return "boolean";
+		default : 
+			return protoType;
+		}
 	}
 	
 	private static IField createBuilderField(String type) {
@@ -51,9 +83,10 @@ class ClassCreator extends TypeCreator<CMClass> {
 		field.setAccess(Access.PRIVATE);
 		field.setFinal(true);
 		field.setName("builder");
-		field.setType(type);
+		field.setType(type + ".Builder");
 		field.setNeedGetter(true);
 		field.setNeedSetter(false);
+		field.setAnnotations(Lists.newLinkedList());
 		return field;
 	}
 	
@@ -69,7 +102,7 @@ class ClassCreator extends TypeCreator<CMClass> {
 		constructor.setName(className);
 		constructor.setReturnType(CMMethod.CONSTRUCTOR_RETURN);
 		
-		constructor.getContents().add("supper(MessageId.MI_" + name + "_VALUE);");
+		constructor.getContents().add("super(MessageId.MI_" + name + "_VALUE);");
 		constructor.getContents().add("builder = " + name + ".newBuilder();");
 		
 		return constructor;
