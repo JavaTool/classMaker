@@ -37,7 +37,7 @@ public final class Output {
 		return new File(dir, inter.getPackage().replaceAll("\\.", "/") + "/" + inter.getName() + ".java");
 	}
 	
-	private static void output(String content, File file) throws Exception {
+	public static void output(String content, File file) throws Exception {
 		if (content != null && content.length() > 0) {
 			file.delete();
 			file.getParentFile().mkdirs();
