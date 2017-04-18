@@ -6,6 +6,7 @@ import org.tool.classMaker.Utils;
 import org.tool.classMaker.input.reader.proto.ProtoReader_A.TypeCreator;
 import org.tool.classMaker.input.struct.CMClass;
 import org.tool.classMaker.input.struct.CMField;
+import org.tool.classMaker.input.struct.CMImportGroup;
 import org.tool.classMaker.input.struct.CMMethod;
 import org.tool.classMaker.input.struct.CMStructBuilder;
 import org.tool.classMaker.struct.Access;
@@ -19,7 +20,7 @@ class ClassCreator extends TypeCreator<CMClass> {
 	private static final CMClass SUPER = createMessageSupper();
 
 	@Override
-	public CMClass create(IClasses classes, String name, String _package, List<String> structLines) {
+	public CMClass create(IClasses classes, String name, List<String> structLines) {
 		String className = Utils._ToUppercase(name);
 		CMClass cmClass = CMStructBuilder.createCMClass(1, (structLines.size() << 1) + 4);
 		cmClass.setAccess(Access.PUBLIC);
@@ -36,6 +37,8 @@ class ClassCreator extends TypeCreator<CMClass> {
 			cmClass.getMethods().add(createGetter(field));
 			cmClass.getMethods().add(createSetter(field));
 		}
+		((CMImportGroup) cmClass.getImportGroup()).addImport(CMStructBuilder.createCMImport(protoPackage + "." + protoName + "." + name));
+		((CMImportGroup) cmClass.getImportGroup()).addImport(CMStructBuilder.createCMImport(protoPackage + ".MessageIdProto.MessageId"));
 		classes.getClasses().put(name, cmClass);
 		return cmClass;
 	}
@@ -110,6 +113,7 @@ class ClassCreator extends TypeCreator<CMClass> {
 	
 	private static CMMethod createConstructor2(String name, String className) {
 		CMMethod constructor = createConstructor1(name, className);
+		constructor.getContents().add("builder.mergeFrom(datas);");
 		constructor.getParams().add(CMStructBuilder.createMethodParam("datas", "byte[]"));
 		constructor.getExceptions().add(CMStructBuilder.createMethodParam("Exception", ""));
 		return constructor;

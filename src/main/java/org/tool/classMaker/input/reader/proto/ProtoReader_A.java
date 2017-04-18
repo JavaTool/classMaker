@@ -12,19 +12,20 @@ import com.google.common.collect.Lists;
 
 public final class ProtoReader_A extends LineReader {
 	
-	@SuppressWarnings("unused")
-	private final String name;
-	
 	private final TypeCreator<CMClass> classCreator;
 	
 	private final TypeCreator<CMEnum> enumCreator;
 	
 	private final List<String> structLines;
 	
+	private String protoName;
+	
 	private String _package;
 	
-	public ProtoReader_A(String name) {
-		this.name = name;
+	private String protoPackage;
+	
+	public ProtoReader_A(String protoName) {
+		this.protoName = protoName;
 		classCreator = new ClassCreator();
 		enumCreator = new EnumCreator();
 		structLines = Lists.newLinkedList();
@@ -41,6 +42,10 @@ public final class ProtoReader_A extends LineReader {
 			structLines.add(line);
 		} else if (line.startsWith("import ")) {
 			
+		} else if (line.startsWith("option java_package ")) {
+			protoPackage = line.split("\"")[1];
+		} else if (line.startsWith("option java_outer_classname ")) {
+			protoName = line.split("\"")[1];
 		} else if (structLines.size() > 0 && line.trim().length() > 0 && !line.trim().startsWith("//")) {
 			if (line.trim().startsWith("{")) {
 				
@@ -48,7 +53,10 @@ public final class ProtoReader_A extends LineReader {
 				String[] infos = structLines.remove(0).split(" ");
 				String type = infos[0];
 				String name = infos[1].replace("{", "");
-				(type.startsWith("message") ? classCreator : enumCreator).create(classes, name, _package, structLines);
+				(type.startsWith("message") ? classCreator : enumCreator).setPackage(_package);
+				(type.startsWith("message") ? classCreator : enumCreator).setProtoName(protoName);
+				(type.startsWith("message") ? classCreator : enumCreator).setProtoPackage(protoPackage);
+				(type.startsWith("message") ? classCreator : enumCreator).create(classes, name, structLines);
 				structLines.clear();
 			} else {
 				structLines.add(line);
@@ -58,14 +66,32 @@ public final class ProtoReader_A extends LineReader {
 	
 	abstract static class TypeCreator<T> {
 		
-		public abstract T create(IClasses classes, String name, String _package, List<String> structLines);
+		protected String protoName;
+		
+		protected String _package;
+		
+		protected String protoPackage;
+		
+		public abstract T create(IClasses classes, String name, List<String> structLines);
+
+		public void setProtoName(String protoName) {
+			this.protoName = protoName;
+		}
+
+		public void setPackage(String _package) {
+			this._package = _package;
+		}
+
+		public void setProtoPackage(String protoPackage) {
+			this.protoPackage = protoPackage;
+		}
 		
 	}
 	
 	private static class EnumCreator extends TypeCreator<CMEnum> {
 
 		@Override
-		public CMEnum create(IClasses classes, String name, String _package, List<String> structLines) {
+		public CMEnum create(IClasses classes, String name, List<String> structLines) {
 			CMEnum cmEnum = new CMEnum();
 			cmEnum.setAccess(Access.PUBLIC);
 			cmEnum.setName(name);

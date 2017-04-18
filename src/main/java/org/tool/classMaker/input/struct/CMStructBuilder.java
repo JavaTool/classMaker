@@ -111,5 +111,16 @@ public final class CMStructBuilder {
 		field.setType(type);
 		return field;
 	}
+	
+	public static CMImport createCMImport(String content, boolean isStatic) {
+		CMImport cmImport = new CMImport();
+		cmImport.setContent(content);
+		cmImport.setStatic(isStatic);
+		return cmImport;
+	}
+	
+	public static CMImport createCMImport(String content) {
+		return createCMImport(content, false);
+	}
 
 }

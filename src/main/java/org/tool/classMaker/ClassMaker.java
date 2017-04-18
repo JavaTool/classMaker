@@ -2,7 +2,7 @@ package org.tool.classMaker;
 
 import org.tool.classMaker.generator.IGeneratorFactory;
 import org.tool.classMaker.input.reader.IReader;
-import org.tool.classMaker.input.stream.FileStream;
+import org.tool.classMaker.input.stream.IInputStreamProvider;
 import org.tool.classMaker.maker.Maker;
 
 final class ClassMaker {
@@ -14,7 +14,8 @@ final class ClassMaker {
 //			"org.tool.classMaker.input.reader.excel.BeanReader_A:org.tool.classMaker.input.reader.excel.XLSXCreator", // reader
 			"org.tool.classMaker.input.reader.proto.ProtoReader_A:a", // reader
 			"D:/My_space/CrossGateBase/src/", // output dir
-			"cg.base.io.newMessage" // package
+			"cg.base.io.newMessage", // package
+			"org.tool.classMaker.input.stream.FileStreamProvider", // input
 	};
 
 	public static void main(String[] args) {
@@ -27,7 +28,7 @@ final class ClassMaker {
 			maker.setReader((IReader) Class.forName(readerInfos[0]).getConstructor(String.class).newInstance(readerInfos[1]));
 			maker.setOutputDir(args[3]);
 			maker.setPackage(args[4]);
-			maker.make(new FileStream().get(args[0]));
+			maker.make((IInputStreamProvider) Class.forName(args[5]).getConstructor(String.class).newInstance(args[0]));
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(1);

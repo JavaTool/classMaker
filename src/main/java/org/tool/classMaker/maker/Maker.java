@@ -1,9 +1,8 @@
 package org.tool.classMaker.maker;
 
-import java.io.InputStream;
-
 import org.tool.classMaker.generator.IGeneratorFactory;
 import org.tool.classMaker.input.reader.IReader;
+import org.tool.classMaker.input.stream.IInputStreamProvider;
 import org.tool.classMaker.output.Output;
 
 public final class Maker {
@@ -16,10 +15,12 @@ public final class Maker {
 	
 	private String _package;
 	
-	public void make(InputStream inputStream) throws Exception {
+	public void make(IInputStreamProvider inputStreamProvider) throws Exception {
 		Output output = new Output(generatorFactory);
 		reader.setPackage(_package);
-		output.output(outputDir, reader.read(inputStream));
+		while (inputStreamProvider.hasNext()) {
+			output.output(outputDir, reader.read(inputStreamProvider.provide()));
+		}
 	}
 
 	public void setReader(IReader reader) {

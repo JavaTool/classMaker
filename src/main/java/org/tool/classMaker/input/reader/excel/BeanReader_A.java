@@ -8,7 +8,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.tool.classMaker.Utils;
 import org.tool.classMaker.input.struct.CMClass;
 import org.tool.classMaker.input.struct.CMField;
-import org.tool.classMaker.input.struct.CMImport;
 import org.tool.classMaker.input.struct.CMImportGroup;
 import org.tool.classMaker.input.struct.CMInterface;
 import org.tool.classMaker.input.struct.CMMethod;
@@ -161,10 +160,7 @@ final class BeanSheetReader extends BaseBeanSheetReader {
 			if (row.getCell(8).getCellType() == Cell.CELL_TYPE_STRING) {
 				CMImportGroup importGroup = new CMImportGroup();
 				for (String imp : row.getCell(8).getStringCellValue().split(";")) {
-					CMImport impor = new CMImport();
-					impor.setStatic(false);
-					impor.setContent(imp);
-					importGroup.addImport(impor);
+					importGroup.addImport(CMStructBuilder.createCMImport(imp));
 				}
 				clz.setImportGroup(importGroup);
 			}

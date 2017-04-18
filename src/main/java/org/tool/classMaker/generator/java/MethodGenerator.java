@@ -31,10 +31,10 @@ final class MethodGenerator extends BaseGenerator<IMethod> {
 		builder.append(")");
 		// exception
 		if (t.getExceptions().size() > 0) {
-			builder.append("throws ");
+			builder.append(" throws ");
 		}
 		for (IField exception : t.getExceptions()) {
-			builder.append(exception.getType()).append(",").append(BLANK);
+			builder.append(exception.getName()).append(",").append(BLANK);
 		}
 		if (t.getExceptions().size() > 0) {
 			builder.setLength(builder.length() - 2);
