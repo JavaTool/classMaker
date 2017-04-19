@@ -5,8 +5,10 @@ import java.util.List;
 import org.tool.classMaker.input.reader.LineReader;
 import org.tool.classMaker.input.struct.CMClass;
 import org.tool.classMaker.input.struct.CMEnum;
+import org.tool.classMaker.input.struct.CMSubEnum;
 import org.tool.classMaker.struct.Access;
 import org.tool.classMaker.struct.IClasses;
+import org.tool.classMaker.struct.ISubEnum;
 
 import com.google.common.collect.Lists;
 
@@ -17,6 +19,8 @@ public final class ProtoReader_A extends LineReader {
 	private final TypeCreator<CMEnum> enumCreator;
 	
 	private final List<String> structLines;
+	
+	private final List<String> importLines;
 	
 	private String protoName;
 	
@@ -29,6 +33,7 @@ public final class ProtoReader_A extends LineReader {
 		classCreator = new ClassCreator();
 		enumCreator = new EnumCreator();
 		structLines = Lists.newLinkedList();
+		importLines = Lists.newLinkedList();
 	}
 
 	@Override
@@ -38,10 +43,10 @@ public final class ProtoReader_A extends LineReader {
 
 	@Override
 	protected void read(IClasses classes, String line) throws Exception {
-		if (line.startsWith("message")) {
+		if (line.startsWith("message") || line.startsWith("enum")) {
 			structLines.add(line);
 		} else if (line.startsWith("import ")) {
-			
+			importLines.add(line.split("\"")[1].split("\\.")[0]);
 		} else if (line.startsWith("option java_package ")) {
 			protoPackage = line.split("\"")[1];
 		} else if (line.startsWith("option java_outer_classname ")) {
@@ -56,7 +61,7 @@ public final class ProtoReader_A extends LineReader {
 				(type.startsWith("message") ? classCreator : enumCreator).setPackage(_package);
 				(type.startsWith("message") ? classCreator : enumCreator).setProtoName(protoName);
 				(type.startsWith("message") ? classCreator : enumCreator).setProtoPackage(protoPackage);
-				(type.startsWith("message") ? classCreator : enumCreator).create(classes, name, structLines);
+				(type.startsWith("message") ? classCreator : enumCreator).create(classes, name, structLines, importLines);
 				structLines.clear();
 			} else {
 				structLines.add(line);
@@ -72,7 +77,7 @@ public final class ProtoReader_A extends LineReader {
 		
 		protected String protoPackage;
 		
-		public abstract T create(IClasses classes, String name, List<String> structLines);
+		public abstract T create(IClasses classes, String name, List<String> structLines, List<String> importLines);
 
 		public void setProtoName(String protoName) {
 			this.protoName = protoName;
@@ -91,15 +96,29 @@ public final class ProtoReader_A extends LineReader {
 	private static class EnumCreator extends TypeCreator<CMEnum> {
 
 		@Override
-		public CMEnum create(IClasses classes, String name, List<String> structLines) {
+		public CMEnum create(IClasses classes, String name, List<String> structLines, List<String> importLines) {
 			CMEnum cmEnum = new CMEnum();
 			cmEnum.setAccess(Access.PUBLIC);
 			cmEnum.setName(name);
 			cmEnum.setPackage(_package);
+			List<ISubEnum> subs = Lists.newArrayListWithCapacity(structLines.size());
+			structLines.forEach(line -> {
+				String[] infos = line.split("=");
+				CMSubEnum cmSubEnum = new CMSubEnum();
+				cmSubEnum.setAccess(Access.PUBLIC);
+				cmSubEnum.setName(infos[0].trim());
+				subs.add(cmSubEnum);
+			});
+			cmEnum.setSubEnums(subs);
 			classes.getEnums().put(name, cmEnum);
 			return cmEnum;
 		}
 		
+	}
+
+	@Override
+	public void clear() {
+		importLines.clear();
 	}
 
 }

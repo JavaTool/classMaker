@@ -14,18 +14,12 @@ public final class FileStreamProvider implements IInputStreamProvider {
 	
 	private final Iterator<File> files;
 	
-	private final String fileType;
-	
-	private final String[] pattens;
-	
 	public FileStreamProvider(String url, String fileType, String patten) {
 		File file = new File(url);
-		files = (file.isDirectory() ? listFiles(file) : Lists.newArrayList(file)).iterator();
-		this.fileType = fileType;
-		this.pattens = patten.split(";");
+		files = (file.isDirectory() ? listFiles(file, fileType, patten.split(";")) : Lists.newArrayList(file)).iterator();
 	}
 	
-	private List<File> listFiles(File dir) {
+	private List<File> listFiles(File dir, String fileType, String[] pattens) {
 		Multimap<Integer, File> map = HashMultimap.create();
 		for (File file : dir.listFiles(file -> {
 			return file.getName().endsWith(fileType);

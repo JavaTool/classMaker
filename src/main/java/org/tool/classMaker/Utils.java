@@ -31,6 +31,17 @@ public class Utils {
 		}
 	}
 	
+	public static String uppercaseTo_(String info) {
+		StringBuilder builder = new StringBuilder(info.substring(0, 1).toUpperCase());
+		for (int i = 1;i < info.length();i++) {
+			if (Character.isUpperCase(info.charAt(i))) {
+				builder.append("_");
+			}
+			builder.append(info.substring(i, i + 1).toUpperCase());
+		}
+		return builder.toString();
+	}
+	
 	public static boolean checkIndex(String[] args, int index) {
 		return args != null && args.length > index && args[index].length() > 0;
 	}

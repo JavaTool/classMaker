@@ -8,8 +8,10 @@ public interface IReader {
 	
 	String CHAR_SET = "utf-8";
 	
-	IClasses read(InputStream inputStream) throws Exception;
+	void read(IClasses classes, InputStream inputStream) throws Exception;
 	
 	void setPackage(String _package);
+	
+	void clear();
 
 }

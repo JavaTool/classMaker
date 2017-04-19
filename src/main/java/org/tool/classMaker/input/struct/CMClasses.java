@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.tool.classMaker.struct.IClass;
 import org.tool.classMaker.struct.IClasses;
+import org.tool.classMaker.struct.IClassesVisitor;
 import org.tool.classMaker.struct.IEnum;
 import org.tool.classMaker.struct.IInterface;
 
@@ -45,6 +46,11 @@ public final class CMClasses implements IClasses {
 
 	public void setEnums(Map<String, IEnum> enums) {
 		this.enums = enums;
+	}
+
+	@Override
+	public void accpet(IClassesVisitor visitor) {
+		visitor.visit(this);
 	}
 
 }

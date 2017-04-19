@@ -5,7 +5,6 @@ import java.io.InputStream;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.tool.classMaker.input.reader.IReader;
-import org.tool.classMaker.input.struct.CMClasses;
 import org.tool.classMaker.struct.IClasses;
 
 public abstract class ExcelReader implements IReader {
@@ -31,15 +30,17 @@ public abstract class ExcelReader implements IReader {
 	}
 
 	@Override
-	public final IClasses read(InputStream inputStream) throws Exception {
+	public final void read(IClasses classes, InputStream inputStream) throws Exception {
 		Workbook workbook = excelLoaderCreator.load(inputStream);
-		IClasses classes = new CMClasses();
 		for (int i = 0;i < (readAll ? 1 : workbook.getNumberOfSheets());i++) {
 			read(classes, workbook.getSheetAt(i), _package, i);
 		}
-		return classes;
 	}
 	
 	protected abstract void read(IClasses classes, Sheet sheet, String _package, int index) throws Exception;
+
+	@Deprecated
+	@Override
+	public void clear() {}
 
 }

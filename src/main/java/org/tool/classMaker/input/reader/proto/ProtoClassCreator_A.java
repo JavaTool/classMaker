@@ -12,6 +12,7 @@ import org.tool.classMaker.input.struct.CMStructBuilder;
 import org.tool.classMaker.struct.Access;
 import org.tool.classMaker.struct.IClasses;
 import org.tool.classMaker.struct.IField;
+import org.tool.classMaker.struct.ISubEnum;
 
 import com.google.common.collect.Lists;
 
@@ -20,40 +21,94 @@ class ClassCreator extends TypeCreator<CMClass> {
 	private static final CMClass SUPER = createMessageSupper();
 
 	@Override
-	public CMClass create(IClasses classes, String name, List<String> structLines) {
+	public CMClass create(IClasses classes, String name, List<String> structLines, List<String> importLines) {
 		String className = Utils._ToUppercase(name);
-		CMClass cmClass = CMStructBuilder.createCMClass(1, (structLines.size() << 1) + 4);
+		CMClass cmClass = CMStructBuilder.createCMClass(1, (structLines.size() << 1) + 5);
 		cmClass.setAccess(Access.PUBLIC);
 		cmClass.setName(className);
 		cmClass.setPackage(_package);
 		cmClass.getFields().add(createBuilderField(name));
 		cmClass.setSuper(SUPER);
-		cmClass.getMethods().add(createConstructor1(name, className));
-		cmClass.getMethods().add(createConstructor2(name, className));
+		List<String> enumNames = transformSubEnums(classes.getEnums().get("MessageId").getSubEnums());
+		cmClass.getMethods().add(createConstructor1(enumNames, name, className));
+		cmClass.getMethods().add(createConstructor2(enumNames, name, className));
+		cmClass.getMethods().add(createConstructor3(enumNames, name, className));
 		cmClass.getMethods().add(createBuildMethod(name));
 		cmClass.getMethods().add(createToByteArrayMethod());
 		for (String line : structLines) {
 			IField field = createLineField(line);
-			cmClass.getMethods().add(createGetter(field));
-			cmClass.getMethods().add(createSetter(field));
+			boolean isRepeated = line.split("=")[0].replaceAll("\t", "").split(" ")[0].equals("repeated");
+			cmClass.getMethods().add(createGetter(field, isRepeated));
+			cmClass.getMethods().add(createSetter(field, isRepeated));
 		}
-		((CMImportGroup) cmClass.getImportGroup()).addImport(CMStructBuilder.createCMImport(protoPackage + "." + protoName + "." + name));
-		((CMImportGroup) cmClass.getImportGroup()).addImport(CMStructBuilder.createCMImport(protoPackage + ".MessageIdProto.MessageId"));
+		CMImportGroup importGroup = ((CMImportGroup) cmClass.getImportGroup());
+		importGroup.addImport(CMStructBuilder.createCMImport(protoPackage + "." + protoName + ".*"));
+//		importLines.forEach(imp -> importGroup.addImport(CMStructBuilder.createCMImport(protoPackage + "." + imp + "Protos.*")));
+		if (enumNames.contains("MI_" + name)) {
+			importGroup.addImport(CMStructBuilder.createCMImport(protoPackage + ".MessageIdProto.MessageId"));
+		}
 		classes.getClasses().put(name, cmClass);
 		return cmClass;
 	}
 	
-	private static CMMethod createGetter(IField field) {
+	private static List<String> transformSubEnums(List<ISubEnum> subs) {
+		List<String> list = Lists.newArrayListWithCapacity(subs.size());
+		subs.forEach(sub -> list.add(sub.getName()));
+		return list;
+	}
+	
+	private static CMMethod createGetter(IField field, boolean isRepeated) {
 		CMMethod method = CMStructBuilder.createGetter(field);
 		method.getContents().clear();
-		method.getContents().add("return builder." + method.getName() + "();");
+		String type = field.getType();
+		type = isRepeated ? type.split("<")[1].replace(">", "") : type;
+		String methodName = method.getName();
+		methodName = isRepeated ? methodName + "List" : methodName;
+		String build = "builder." + methodName + "()";
+		if (isRepeated && !isDefaultJavaType(type)) {
+			method.getContents().add("java.util.List<" + type + "> list = com.google.common.collect.Lists.newLinkedList();");
+			method.getContents().add(build + ".forEach(vo -> list.add(new " + type + "(vo)));");
+			method.getContents().add("return list;");
+		} else {
+			method.getContents().add("return " + (isDefaultJavaType(type) ? build : ("new " + type + "(" + build + ")")) + ";");
+		}
 		return method;
 	}
 	
-	private static CMMethod createSetter(IField field) {
+	private static boolean isDefaultJavaType(String type) {
+		switch (type) {
+		case "String" : 
+		case "int" : 
+		case "Integer" : 
+		case "long" : 
+		case "Long" : 
+		case "boolean" : 
+		case "Boolean" : 
+		case "float" : 
+		case "Float" : 
+		case "double" : 
+		case "Double" : 
+		case "bytes" : 
+			return true;
+		default : 
+			return false;
+		}
+	}
+	
+	private static CMMethod createSetter(IField field, boolean isRepeated) {
 		CMMethod method = CMStructBuilder.createSetter(field);
 		method.getContents().clear();
-		method.getContents().add("builder." + method.getName() + "(" + field.getName() + ");");
+		String type = field.getType();
+		type = isRepeated ? type.split("<")[1].replace(">", "") : type;
+		String methodName = method.getName();
+		methodName = isRepeated ? methodName.replace("set", "addAll") : methodName;
+		if (isRepeated && !isDefaultJavaType(type)) {
+			method.getContents().add("java.util.List<" + Utils.uppercaseTo_(type) + "> list = com.google.common.collect.Lists.newLinkedList();");
+			method.getContents().add(field.getName() + ".forEach(o -> list.add(o.build()));");
+			method.getContents().add("builder." + methodName + "(list);");
+		} else {
+			method.getContents().add("builder." + methodName + "(" + field.getName() + (isDefaultJavaType(type) ?  "" : ".build()") + ");");
+		}
 		return method;
 	}
 	
@@ -62,8 +117,26 @@ class ClassCreator extends TypeCreator<CMClass> {
 		CMField field = new CMField();
 		field.setName(infos[2]);
 		String type = transformJavaType(infos[1]);
-		field.setType(infos[0].equals("repeated") ? "java.util.List<" + type + ">" : type);
+		field.setType(infos[0].equals("repeated") ? "java.util.List<" + baseTypeToPackageType(type) + ">" : type);
+		field.setNote(line.contains("//") ? line.split("//")[1].trim() : field.getName());
 		return field;
+	}
+	
+	private static String baseTypeToPackageType(String type) {
+		switch (type) {
+		case "int" : 
+			return "Integer";
+		case "long" : 
+			return "Long";
+		case "boolean" : 
+			return "Boolean";
+		case "float" : 
+			return "Float";
+		case "double" : 
+			return "Double";
+		default : 
+			return type;
+		}
 	}
 	
 	private static String transformJavaType(String protoType) {
@@ -76,8 +149,24 @@ class ClassCreator extends TypeCreator<CMClass> {
 			return "long";
 		case "bool" : 
 			return "boolean";
+		case "bytes" : 
+			return "com.google.protobuf.ByteString";
 		default : 
-			return protoType;
+			return isDefaulType(protoType) ? protoType : Utils._ToUppercase(protoType);
+		}
+	}
+	
+	private static boolean isDefaulType(String protoType) {
+		switch (protoType) {
+		case "string" : 
+		case "int32" : 
+		case "int64" : 
+		case "bool" : 
+		case "float" : 
+		case "double" : 
+			return true;
+		default : 
+			return false;
 		}
 	}
 	
@@ -90,6 +179,7 @@ class ClassCreator extends TypeCreator<CMClass> {
 		field.setNeedGetter(true);
 		field.setNeedSetter(false);
 		field.setAnnotations(Lists.newLinkedList());
+		field.setDefaultValue(type + ".newBuilder()");
 		return field;
 	}
 	
@@ -100,22 +190,30 @@ class ClassCreator extends TypeCreator<CMClass> {
 		return cmClass;
 	}
 	
-	private static CMMethod createConstructor1(String name, String className) {
+	private static CMMethod createConstructor1(List<String> enumNames, String name, String className) {
 		CMMethod constructor = CMStructBuilder.createPublicCMMethod();
 		constructor.setName(className);
 		constructor.setReturnType(CMMethod.CONSTRUCTOR_RETURN);
-		
-		constructor.getContents().add("super(MessageId.MI_" + name + "_VALUE);");
-		constructor.getContents().add("builder = " + name + ".newBuilder();");
-		
+		constructor.getContents().add(enumNames.contains("MI_" + name) ? "super(MessageId.MI_" + name + "_VALUE);" : "super(0);");
 		return constructor;
 	}
 	
-	private static CMMethod createConstructor2(String name, String className) {
-		CMMethod constructor = createConstructor1(name, className);
+	private static CMMethod createConstructor2(List<String> enumNames, String name, String className) {
+		CMMethod constructor = createConstructor1(enumNames, name, className);
+		constructor.getContents().clear();
+		constructor.getContents().add("this();");
 		constructor.getContents().add("builder.mergeFrom(datas);");
 		constructor.getParams().add(CMStructBuilder.createMethodParam("datas", "byte[]"));
 		constructor.getExceptions().add(CMStructBuilder.createMethodParam("Exception", ""));
+		return constructor;
+	}
+	
+	private static CMMethod createConstructor3(List<String> enumNames, String name, String className) {
+		CMMethod constructor = createConstructor1(enumNames, name, className);
+		constructor.getContents().clear();
+		constructor.getContents().add("this();");
+		constructor.getContents().add("builder.mergeFrom(proto);");
+		constructor.getParams().add(CMStructBuilder.createMethodParam("proto", name));
 		return constructor;
 	}
 	

@@ -9,5 +9,7 @@ public interface IClasses {
 	Map<String, IClass> getClasses();
 	
 	Map<String, IEnum> getEnums();
+	
+	void accpet(IClassesVisitor vistor);
 
 }
