@@ -7,10 +7,10 @@ import org.tool.classMaker.input.reader.proto.ProtoReader_A.TypeCreator;
 import org.tool.classMaker.input.struct.CMClass;
 import org.tool.classMaker.input.struct.CMField;
 import org.tool.classMaker.input.struct.CMImportGroup;
+import org.tool.classMaker.input.struct.CMInterface;
 import org.tool.classMaker.input.struct.CMMethod;
 import org.tool.classMaker.input.struct.CMStructBuilder;
 import org.tool.classMaker.struct.Access;
-import org.tool.classMaker.struct.IClass;
 import org.tool.classMaker.struct.IClasses;
 import org.tool.classMaker.struct.IField;
 import org.tool.classMaker.struct.ISubEnum;
@@ -47,68 +47,30 @@ class ClassCreator extends TypeCreator<CMClass> {
 		if (enumNames.contains("MI_" + name)) {
 			importGroup.addImport(CMStructBuilder.createCMImport(protoPackage + ".MessageIdProto.MessageId"));
 		}
+		cmClass.getInterfaces().add(createInterface(classes, cmClass));
 		classes.getClasses().put(name, cmClass);
-		appendRepeatedUtils(classes, cmClass);
+		new RepeatedUtilsBuilder(_package).appendRepeatedUtils(classes, cmClass);
 		return cmClass;
 	}
 	
-	private void appendRepeatedUtils(IClasses classes, CMClass cmClass) {
-		String className = "RepeatedUtils";
-		IClass utilsClass = classes.getClasses().get(className);
-		if (utilsClass == null) {
-			utilsClass = createRepeatedUtils();
-			classes.getClasses().put(className, utilsClass);
-		}
-
-		utilsClass.getMethods().add(createFromCMMethod(cmClass));
-		utilsClass.getMethods().add(createToCMMethod(cmClass));
-	}
-	
-	private static CMMethod createFromCMMethod(CMClass cmClass) {
-		String className = cmClass.getName();
-		CMMethod method = CMStructBuilder.createPublicCMMethod();
-		method.setStatic(true);
-		method.setName("from" + className);
-		String returnType = "List<" + Utils.uppercaseTo_(className) + ">";
-		method.setReturnType(returnType);
-		CMField param = new CMField();
-		param.setName("list");
-		param.setType("List<" + className + ">");
-		method.setParams(Lists.newArrayList(param));
-		method.getContents().add(returnType + " ret = Lists.newLinkedList();");
-		method.getContents().add("list.forEach(o -> ret.add(o.build()));");
-		method.getContents().add("return ret;");
-		return method;
-	}
-	
-	private static CMMethod createToCMMethod(CMClass cmClass) {
-		String className = cmClass.getName();
-		CMMethod method = CMStructBuilder.createPublicCMMethod();
-		method.setStatic(true);
-		method.setName("to" + className);
-		String returnType = "List<" + className + ">";
-		method.setReturnType(returnType);
-		CMField param = new CMField();
-		param.setName("list");
-		param.setType("List<" + Utils.uppercaseTo_(className) + ">");
-		method.setParams(Lists.newArrayList(param));
-		method.getContents().add(returnType + " ret = Lists.newLinkedList();");
-		method.getContents().add("list.forEach(o -> ret.add(new " + className + "(o)));");
-		method.getContents().add("return ret;");
-		return method;
-	}
-	
-	private IClass createRepeatedUtils() {
-		CMClass utilsClass = CMStructBuilder.createCMClass(0, 0);
-		utilsClass.setAccess(Access.PUBLIC);
-		utilsClass.setFinal(true);
-		utilsClass.setName("RepeatedUtils");
-		utilsClass.setPackage(_package);
-		
-		CMImportGroup importGroup = ((CMImportGroup) utilsClass.getImportGroup());
-		importGroup.addImport(CMStructBuilder.createCMImport("java.util.List"));
-		importGroup.addImport(CMStructBuilder.createCMImport("com.google.common.collect.Lists"));
-		return utilsClass;
+	private CMInterface createInterface(IClasses classes, CMClass cmClass) {
+		CMInterface inter = CMStructBuilder.createCMInterface(cmClass.getMethods().size());
+		inter.setName("I" + cmClass.getName());
+		inter.setPackage(_package);
+		cmClass.getMethods().forEach(m -> {
+			if (m.getName().startsWith("get") || m.getName().startsWith("set")) {
+				CMMethod method = CMStructBuilder.createPublicCMMethod();
+				method.setAbstract(true);
+				method.setInterface(true);
+				method.setName(m.getName());
+				method.setParams(m.getParams());
+				method.setReturnType(m.getReturnType());
+				method.setNote(m.getNote());
+				inter.getMethods().add(method);
+			}
+		});
+		classes.getInterfaces().put(inter.getName(), inter);
+		return inter;
 	}
 	
 	private static List<String> transformSubEnums(List<ISubEnum> subs) {
@@ -125,9 +87,8 @@ class ClassCreator extends TypeCreator<CMClass> {
 		String methodName = method.getName();
 		methodName = isRepeated ? methodName + "List" : methodName;
 		String build = "builder." + methodName + "()";
+		method.getAnnotations().add("Override");
 		if (isRepeated && !isDefaultJavaType(type)) {
-//			method.getContents().add("java.util.List<" + type + "> list = com.google.common.collect.Lists.newLinkedList();");
-//			method.getContents().add(build + ".forEach(vo -> list.add(new " + type + "(vo)));");
 			method.getContents().add("return RepeatedUtils.to" + type + "(" + build + ");");
 		} else {
 			method.getContents().add("return " + (isDefaultJavaType(type) ? build : ("new " + type + "(" + build + ")")) + ";");
@@ -162,9 +123,8 @@ class ClassCreator extends TypeCreator<CMClass> {
 		type = isRepeated ? type.split("<")[1].replace(">", "") : type;
 		String methodName = method.getName();
 		methodName = isRepeated ? methodName.replace("set", "addAll") : methodName;
+		method.getAnnotations().add("Override");
 		if (isRepeated && !isDefaultJavaType(type)) {
-//			method.getContents().add("java.util.List<" + Utils.uppercaseTo_(type) + "> list = com.google.common.collect.Lists.newLinkedList();");
-//			method.getContents().add(field.getName() + ".forEach(o -> list.add(o.build()));");
 			method.getContents().add("builder." + methodName + "(RepeatedUtils.from" + type + "(" + field.getName() + "));");
 		} else {
 			method.getContents().add("builder." + methodName + "(" + field.getName() + (isDefaultJavaType(type) ?  "" : ".build()") + ");");
