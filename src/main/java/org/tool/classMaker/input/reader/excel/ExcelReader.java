@@ -39,8 +39,4 @@ public abstract class ExcelReader implements IReader {
 	
 	protected abstract void read(IClasses classes, Sheet sheet, String _package, int index) throws Exception;
 
-	@Deprecated
-	@Override
-	public void clear() {}
-
 }

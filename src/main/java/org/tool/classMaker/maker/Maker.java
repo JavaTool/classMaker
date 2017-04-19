@@ -24,7 +24,6 @@ public final class Maker {
 		IClasses classes = new CMClasses();
 		while (inputStreamProvider.hasNext()) {
 			reader.read(classes, inputStreamProvider.provide());
-			reader.clear();
 		}
 		classes.accpet(classesVisitor == null ? (t -> {}) : classesVisitor);
 		output.output(outputDir, classes);

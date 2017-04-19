@@ -50,8 +50,7 @@ public final class JsonReader extends LineReader {
 		}
 	}
 
-	@Deprecated
 	@Override
-	public void clear() {}
+	protected void readFinish(IClasses classes) {}
 
 }

@@ -11,7 +11,5 @@ public interface IReader {
 	void read(IClasses classes, InputStream inputStream) throws Exception;
 	
 	void setPackage(String _package);
-	
-	void clear();
 
 }

@@ -38,11 +38,11 @@ public final class CMStructBuilder {
 		clz.setAccess(Access.PUBLIC);
 		List<String> annotations = ImmutableList.of();
 		clz.setAnnotations(annotations);
-		List<IField> fields = Lists.newArrayListWithCapacity(fieldCount);
+		List<IField> fields = fieldCount == 0 ? Lists.newLinkedList() : Lists.newArrayListWithCapacity(fieldCount);
 		clz.setFields(fields);
 		List<IInterface> innerClasses = Lists.newLinkedList();
 		clz.setInnerClasses(innerClasses);
-		List<IMethod> methods = Lists.newArrayListWithCapacity(methodCount);
+		List<IMethod> methods = methodCount == 0 ? Lists.newLinkedList() : Lists.newArrayListWithCapacity(methodCount);
 		clz.setMethods(methods);
 		clz.setFinal(false);
 		clz.setStatic(false);

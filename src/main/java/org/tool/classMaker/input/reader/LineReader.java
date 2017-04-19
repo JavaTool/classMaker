@@ -15,9 +15,12 @@ public abstract class LineReader implements IReader {
 			while ((line = reader.readLine()) != null) {
 				read(classes, line);
 			}
+			readFinish(classes);
 		}
 	}
 	
 	protected abstract void read(IClasses classes, String line) throws Exception;
+	
+	protected abstract void readFinish(IClasses classes);
 
 }
