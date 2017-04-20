@@ -145,7 +145,7 @@ public final class ProtoReader_A extends LineReader {
 					method.setReturnType(CMMethod.NONE_RETURN);
 					((CMImportGroup) cmInterface.getImportGroup()).addImport(CMStructBuilder.createCMImport(inter.getPackage() + "." + inter.getName()));
 					method.getParams().add(CMStructBuilder.createMethodParam("csMessage", inter.getName()));
-					method.getParams().add(CMStructBuilder.createMethodParam("sender", "ISender"));
+					method.getParams().add(CMStructBuilder.createMethodParam("sender", "IMessageSender"));
 					cmInterface.getMethods().add(method);
 					break;
 				}
@@ -161,7 +161,7 @@ public final class ProtoReader_A extends LineReader {
 		CMInterface cmInterface = CMStructBuilder.createCMInterface(0);
 		cmInterface.setPackage(_package);
 		cmInterface.setName("I" + name);
-		((CMImportGroup) cmInterface.getImportGroup()).addImport(CMStructBuilder.createCMImport("org.tool.server.io.dispatch.ISender"));
+		((CMImportGroup) cmInterface.getImportGroup()).addImport(CMStructBuilder.createCMImport("org.tool.server.io.proto.IMessageSender"));
 		return cmInterface;
 	}
 

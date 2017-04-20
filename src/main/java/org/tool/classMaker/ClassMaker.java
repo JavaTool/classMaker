@@ -9,17 +9,17 @@ import org.tool.classMaker.struct.IClassesVisitor;
 final class ClassMaker {
 	
 	private static final String[] DEFAULT_ARGS = new String[] {
-			"D:/My_space/CrossGateSource/config/configuration.xml", // url
+			"D:/My_space/CrossGateProject/program/proto/proto_src", // url
 			"org.tool.classMaker.generator.java.GeneratorFactory", // factory
 //			"org.tool.classMaker.input.reader.excel.ConfReader_A:org.tool.classMaker.input.reader.excel.XLSXCreator;false", // reader
 //			"org.tool.classMaker.input.reader.excel.BeanReader_A:org.tool.classMaker.input.reader.excel.XLSXCreator", // reader
-//			"org.tool.classMaker.input.reader.proto.ProtoReader_A:a", // reader
-			"org.tool.classMaker.input.reader.xml.DomReader:org.tool.classMaker.input.reader.xml.JavaBindClassCreator_A", // reader
-			"D:/My_space/CrossGateSource/src/", // output dir
-			"cg.source", // package
+			"org.tool.classMaker.input.reader.proto.ProtoReader_A:a", // reader
+//			"org.tool.classMaker.input.reader.xml.DomReader:org.tool.classMaker.input.reader.xml.JavaBindClassCreator_A", // reader
+			"D:/My_space/CrossGateBase/src/", // output dir
+			"cg.base.io.message", // package
 			"org.tool.classMaker.input.stream.FileStreamProvider:proto:MessageId;*", // inputProvider
-//			"org.tool.classMaker.input.reader.proto.ProtoClassesVisitor_A", // classesVisitor
-			"", // classesVisitor
+			"org.tool.classMaker.input.reader.proto.ProtoClassesVisitor_A", // classesVisitor
+//			"", // classesVisitor
 	};
 
 	public static void main(String[] args) {
