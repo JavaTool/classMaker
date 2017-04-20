@@ -25,7 +25,7 @@ public final class CMStructBuilder {
 		cmInterface.setImportGroup(new CMImportGroup());
 		List<IInterface> innerClasses = ImmutableList.of();
 		cmInterface.setInnerClasses(innerClasses);
-		List<IMethod> methods = Lists.newArrayListWithCapacity(methodCount);
+		List<IMethod> methods = methodCount == 0 ? Lists.newLinkedList() : Lists.newArrayListWithCapacity(methodCount);
 		cmInterface.setMethods(methods);
 		List<IInterface> interfaces = Lists.newLinkedList();
 		cmInterface.setInterfaces(interfaces);

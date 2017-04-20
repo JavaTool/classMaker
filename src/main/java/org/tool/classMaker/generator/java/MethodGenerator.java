@@ -39,10 +39,10 @@ final class MethodGenerator extends BaseGenerator<IMethod> {
 		if (t.getExceptions().size() > 0) {
 			builder.setLength(builder.length() - 2);
 		}
-		builder.append(BLANK);
 		if (t.isAbstract()) {
 			builder.append(";").append(LN);
 		} else {
+			builder.append(BLANK);
 			builder.append("{").append(LN);
 			// content
 			for (String content : t.getContents()) {
