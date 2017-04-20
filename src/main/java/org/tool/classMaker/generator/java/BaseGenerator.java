@@ -19,8 +19,10 @@ public abstract class BaseGenerator<T extends IBase> implements IGenerator<T> {
 			builder.append(tab).append(" * ").append(note).append(LN);
 			builder.append(tab).append(" */").append(LN);
 		}
-		for (String annotation : t.getAnnotations()) {
-			builder.append(tab).append("@").append(annotation).append(LN);
+		if (t.getAnnotations() != null) {
+			for (String annotation : t.getAnnotations()) {
+				builder.append(tab).append("@").append(annotation).append(LN);
+			}
 		}
 		builder.append(tab);
 		generateHead(t, builder);

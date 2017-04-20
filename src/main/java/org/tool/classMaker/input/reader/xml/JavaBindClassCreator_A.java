@@ -31,6 +31,7 @@ public class JavaBindClassCreator_A implements IXmlClassCreator {
 		cmClass.getMethods().add(createGetMethod());
 		cmClass.getMethods().add(createGetMethodByDefault());
 		cmClass.getMethods().add(createFromFileMethod());
+		classes.getClasses().put(cmClass.getName(), cmClass);
 		
 		list.forEach(element -> {
 			String name = element.getName();
@@ -84,7 +85,7 @@ public class JavaBindClassCreator_A implements IXmlClassCreator {
 		CMField staticField = new CMField();
 		staticField.setAccess(Access.PUBLIC);
 		staticField.setName(name.toUpperCase());
-		staticField.setDefaultValue(name);
+		staticField.setDefaultValue("\"" + name + "\"");
 		staticField.setFinal(true);
 		staticField.setType("String");
 		staticField.setStatic(true);
@@ -103,14 +104,15 @@ public class JavaBindClassCreator_A implements IXmlClassCreator {
 	}
 	
 	private static final void addImports(CMImportGroup importGroup) {
-		importGroup.addImport(CMStructBuilder.createCMImport("org.tool.server.io.IConfigurationHolder"));
-		importGroup.addImport(CMStructBuilder.createCMImport("java.util.Map"));
 		importGroup.addImport(CMStructBuilder.createCMImport("com.google.common.collect.Maps"));
+		importGroup.addImport(CMStructBuilder.createCMImport("java.io.File"));
+		importGroup.addImport(CMStructBuilder.createCMImport("java.util.Map"));
 		importGroup.addImport(CMStructBuilder.createCMImport("javax.xml.bind.annotation.XmlRootElement"));
 		importGroup.addImport(CMStructBuilder.createCMImport("javax.xml.bind.annotation.XmlElement"));
 		importGroup.addImport(CMStructBuilder.createCMImport("javax.xml.bind.JAXBContext"));
 		importGroup.addImport(CMStructBuilder.createCMImport("javax.xml.bind.JAXBException"));
 		importGroup.addImport(CMStructBuilder.createCMImport("javax.xml.bind.Unmarshaller"));
+		importGroup.addImport(CMStructBuilder.createCMImport("org.tool.server.io.IConfigurationHolder"));
 	}
 
 }
