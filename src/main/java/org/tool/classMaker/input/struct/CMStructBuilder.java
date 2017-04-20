@@ -36,7 +36,7 @@ public final class CMStructBuilder {
 	public static CMClass createCMClass(int fieldCount, int methodCount) {
 		CMClass clz = new CMClass();
 		clz.setAccess(Access.PUBLIC);
-		List<String> annotations = ImmutableList.of();
+		List<String> annotations = Lists.newLinkedList();
 		clz.setAnnotations(annotations);
 		List<IField> fields = fieldCount == 0 ? Lists.newLinkedList() : Lists.newArrayListWithCapacity(fieldCount);
 		clz.setFields(fields);
