@@ -19,26 +19,32 @@ public abstract class CMBase implements IBase {
 	
 	private IAccess access;
 
+	@Override
 	public String getName() {
 		return name;
 	}
 
+	@Override
 	public String getNote() {
 		return note;
 	}
 
+	@Override
 	public List<String> getAnnotations() {
 		return annotations;
 	}
 
+	@Override
 	public boolean isFinal() {
 		return isFinal;
 	}
 
+	@Override
 	public boolean isStatic() {
 		return isStatic;
 	}
 
+	@Override
 	public IAccess getAccess() {
 		return access;
 	}

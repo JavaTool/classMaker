@@ -41,7 +41,7 @@ final class RepeatedUtilsBuilder {
 		method.setReturnType(returnType);
 		CMField param = new CMField();
 		param.setName("list");
-		param.setType("List<" + className + ">");
+		param.setType("List<I" + className + ">");
 		method.setParams(Lists.newArrayList(param));
 		method.getContents().add(returnType + " ret = Lists.newLinkedList();");
 		method.getContents().add("list.forEach(o -> ret.add(o.build()));");
@@ -54,14 +54,14 @@ final class RepeatedUtilsBuilder {
 		CMMethod method = CMStructBuilder.createPublicCMMethod();
 		method.setStatic(true);
 		method.setName("to" + className);
-		String returnType = "List<" + className + ">";
+		String returnType = "List<I" + className + ">";
 		method.setReturnType(returnType);
 		CMField param = new CMField();
 		param.setName("list");
 		param.setType("List<" + Utils.uppercaseTo_(className) + ">");
 		method.setParams(Lists.newArrayList(param));
 		method.getContents().add(returnType + " ret = Lists.newLinkedList();");
-		method.getContents().add("list.forEach(o -> ret.add(new " + className + "(o)));");
+		method.getContents().add("list.forEach(o -> ret.add(" + className + ".from(o)));");
 		method.getContents().add("return ret;");
 		return method;
 	}
@@ -71,11 +71,12 @@ final class RepeatedUtilsBuilder {
 		utilsClass.setAccess(Access.PUBLIC);
 		utilsClass.setFinal(true);
 		utilsClass.setName("RepeatedUtils");
-		utilsClass.setPackage(_package);
+		utilsClass.setPackage(_package + ".proto");
 		
 		CMImportGroup importGroup = ((CMImportGroup) utilsClass.getImportGroup());
 		importGroup.addImport(CMStructBuilder.createCMImport("java.util.List"));
 		importGroup.addImport(CMStructBuilder.createCMImport("com.google.common.collect.Lists"));
+		importGroup.addImport(CMStructBuilder.createCMImport(_package + ".interfaces.*"));
 		return utilsClass;
 	}
 

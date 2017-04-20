@@ -9,6 +9,7 @@ public class CMSubEnum extends CMBase implements ISubEnum {
 	
 	private List<IField> params;
 
+	@Override
 	public List<IField> getParams() {
 		return params;
 	}

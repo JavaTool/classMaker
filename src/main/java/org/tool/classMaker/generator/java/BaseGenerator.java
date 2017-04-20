@@ -13,7 +13,7 @@ public abstract class BaseGenerator<T extends IBase> implements IGenerator<T> {
 	
 	private String generateBase(T t, String tab) {
 		StringBuilder builder = new StringBuilder();
-		String note = t.getNote() != null && t.getNote().length() > 0 ? t.getNote() : "";
+		String note = t.getNote() != null && t.getNote().length() > 0 ? t.getNote() : "Generate by classMaker.";
 		if (note.length() > 0) {
 			builder.append(tab).append("/**").append(LN);
 			builder.append(tab).append(" * ").append(note).append(LN);

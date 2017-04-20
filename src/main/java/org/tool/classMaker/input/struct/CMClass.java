@@ -6,6 +6,7 @@ public final class CMClass extends CMInterface implements IClass {
 	
 	private IClass _super;
 
+	@Override
 	public IClass getSupper() {
 		return _super;
 	}

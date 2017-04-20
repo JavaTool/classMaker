@@ -21,30 +21,37 @@ public final class CMMethod extends CMBase implements IMethod {
 	
 	private List<IField> exceptions;
 
+	@Override
 	public String getReturnType() {
 		return returnType;
 	}
 
+	@Override
 	public boolean isSynchronized() {
 		return isSynchronized;
 	}
 
+	@Override
 	public boolean isAbstract() {
 		return isAbstract;
 	}
 
+	@Override
 	public boolean isInterface() {
 		return isInterface;
 	}
 
+	@Override
 	public List<IField> getParams() {
 		return params;
 	}
 
+	@Override
 	public List<String> getContents() {
 		return contents;
 	}
 
+	@Override
 	public List<IField> getExceptions() {
 		return exceptions;
 	}

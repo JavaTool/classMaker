@@ -9,6 +9,7 @@ public final class CMEnum extends CMInterface implements IEnum {
 	
 	private List<ISubEnum> subEnums;
 
+	@Override
 	public List<ISubEnum> getSubEnums() {
 		return subEnums;
 	}

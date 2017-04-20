@@ -16,26 +16,32 @@ public final class CMField extends CMBase implements IField {
 	
 	private boolean needSetter;
 
+	@Override
 	public String getType() {
 		return type;
 	}
 
+	@Override
 	public String getDefaultValue() {
 		return defaultValue;
 	}
 
+	@Override
 	public boolean isTransient() {
 		return isTransient;
 	}
 
+	@Override
 	public boolean isVolatile() {
 		return isVolatile;
 	}
 
+	@Override
 	public boolean isNeedGetter() {
 		return needGetter;
 	}
 
+	@Override
 	public boolean isNeedSetter() {
 		return needSetter;
 	}

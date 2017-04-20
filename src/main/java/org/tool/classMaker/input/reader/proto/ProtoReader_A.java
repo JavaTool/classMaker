@@ -6,7 +6,6 @@ import org.tool.classMaker.Utils;
 import org.tool.classMaker.input.reader.LineReader;
 import org.tool.classMaker.input.struct.CMClass;
 import org.tool.classMaker.input.struct.CMEnum;
-import org.tool.classMaker.input.struct.CMField;
 import org.tool.classMaker.input.struct.CMImportGroup;
 import org.tool.classMaker.input.struct.CMInterface;
 import org.tool.classMaker.input.struct.CMMethod;
@@ -134,7 +133,7 @@ public final class ProtoReader_A extends LineReader {
 		if (utilsClass != null) {
 			((CMImportGroup) utilsClass.getImportGroup()).addImport(CMStructBuilder.createCMImport(protoPackage + "." + protoName + ".*"));
 		}
-		CMInterface cmInterface = createProcessor(_package, Utils.firstUpper(protoName) + "Processor");
+		CMInterface cmInterface = createProcessor(_package + ".processor", Utils.firstUpper(protoName) + "Processor");
 		classNames.forEach(name -> {
 			for (ISubEnum enu : classes.getEnums().get("MessageId").getSubEnums()) {
 				if (!name.startsWith("SC_") && enu.getName().equals("MI_" + name)) {
@@ -144,15 +143,9 @@ public final class ProtoReader_A extends LineReader {
 					method.setInterface(true);
 					method.setName("process" + inter.getName().replaceFirst("ICs", "").replaceFirst("IVo", ""));
 					method.setReturnType(CMMethod.NONE_RETURN);
-					CMField param1 = new CMField();
-					param1.setName("csMessage");
-					param1.setType(inter.getName());
 					((CMImportGroup) cmInterface.getImportGroup()).addImport(CMStructBuilder.createCMImport(inter.getPackage() + "." + inter.getName()));
-					method.getParams().add(param1);
-					CMField param2 = new CMField();
-					param2.setName("sender");
-					param2.setType("ISender");
-					method.getParams().add(param2);
+					method.getParams().add(CMStructBuilder.createMethodParam("csMessage", inter.getName()));
+					method.getParams().add(CMStructBuilder.createMethodParam("sender", "ISender"));
 					cmInterface.getMethods().add(method);
 					break;
 				}

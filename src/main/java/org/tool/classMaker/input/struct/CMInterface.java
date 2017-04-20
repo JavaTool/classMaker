@@ -21,22 +21,27 @@ public class CMInterface extends CMBase implements IInterface {
 	
 	private IImportGroup importGroup;
 
+	@Override
 	public final String getPackage() {
 		return _package;
 	}
 
+	@Override
 	public final List<IMethod> getMethods() {
 		return methods;
 	}
 
+	@Override
 	public final List<IField> getFields() {
 		return fields;
 	}
 
+	@Override
 	public final List<IInterface> getInterfaces() {
 		return interfaces;
 	}
 
+	@Override
 	public final List<IInterface> getInnerClasses() {
 		return innerClasses;
 	}
