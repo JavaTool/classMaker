@@ -1,6 +1,7 @@
 package org.tool.classMaker.input.reader.proto;
 
 import java.util.List;
+import java.util.Map;
 
 import org.tool.classMaker.Utils;
 import org.tool.classMaker.input.reader.proto.ProtoReader_A.TypeCreator;
@@ -22,7 +23,7 @@ class ClassCreator extends TypeCreator<CMClass> {
 	private static final CMClass SUPER = createMessageSupper();
 
 	@Override
-	public CMClass create(IClasses classes, String name, List<String> structLines) {
+	public CMClass create(IClasses classes, String name, List<String> structLines, Map<String, String> notes) {
 		String className = Utils._ToUppercase(name);
 		CMClass cmClass = CMStructBuilder.createCMClass(1, (structLines.size() << 1) + 6);
 		cmClass.setAccess(Access.PUBLIC);

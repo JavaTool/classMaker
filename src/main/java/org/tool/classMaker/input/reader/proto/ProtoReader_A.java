@@ -1,6 +1,7 @@
 package org.tool.classMaker.input.reader.proto;
 
 import java.util.List;
+import java.util.Map;
 
 import org.tool.classMaker.Utils;
 import org.tool.classMaker.input.reader.LineReader;
@@ -18,6 +19,7 @@ import org.tool.classMaker.struct.IInterface;
 import org.tool.classMaker.struct.ISubEnum;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 public final class ProtoReader_A extends LineReader {
 	
@@ -35,12 +37,17 @@ public final class ProtoReader_A extends LineReader {
 	
 	private String protoPackage;
 	
+	private String note;
+	
+	private Map<String, String> notes;
+	
 	public ProtoReader_A(String protoName) {
 		this.protoName = protoName;
 		classCreator = new ClassCreator();
 		enumCreator = new EnumCreator();
 		structLines = Lists.newLinkedList();
 		classNames = Lists.newLinkedList();
+		notes = Maps.newHashMap();
 	}
 
 	@Override
@@ -52,8 +59,11 @@ public final class ProtoReader_A extends LineReader {
 	protected void read(IClasses classes, String line) throws Exception {
 		if (line.startsWith("message") || line.startsWith("enum")) {
 			structLines.add(line);
+			notes.clear();
 		} else if (line.startsWith("import ")) {
 			
+		} else if (line.trim().startsWith("//")) {
+			note = line.trim().substring(2).trim();
 		} else if (line.startsWith("option java_package ")) {
 			protoPackage = line.split("\"")[1];
 		} else if (line.startsWith("option java_outer_classname ")) {
@@ -68,13 +78,14 @@ public final class ProtoReader_A extends LineReader {
 				(type.startsWith("message") ? classCreator : enumCreator).setPackage(_package);
 				(type.startsWith("message") ? classCreator : enumCreator).setProtoName(protoName);
 				(type.startsWith("message") ? classCreator : enumCreator).setProtoPackage(protoPackage);
-				(type.startsWith("message") ? classCreator : enumCreator).create(classes, name, structLines);
+				(type.startsWith("message") ? classCreator : enumCreator).create(classes, name, structLines, notes);
 				if (type.startsWith("message")) {
 					classNames.add(name);
 				}
 				structLines.clear();
 			} else {
 				structLines.add(line);
+				notes.put(line, note);
 			}
 		}
 	}
@@ -87,7 +98,7 @@ public final class ProtoReader_A extends LineReader {
 		
 		protected String protoPackage;
 		
-		public abstract T create(IClasses classes, String name, List<String> structLines);
+		public abstract T create(IClasses classes, String name, List<String> structLines, Map<String, String> notes);
 
 		public void setProtoName(String protoName) {
 			this.protoName = protoName;
@@ -106,7 +117,7 @@ public final class ProtoReader_A extends LineReader {
 	private static class EnumCreator extends TypeCreator<CMEnum> {
 
 		@Override
-		public CMEnum create(IClasses classes, String name, List<String> structLines) {
+		public CMEnum create(IClasses classes, String name, List<String> structLines, Map<String, String> notes) {
 			CMEnum cmEnum = new CMEnum();
 			cmEnum.setAccess(Access.PUBLIC);
 			cmEnum.setName(name);
@@ -117,6 +128,7 @@ public final class ProtoReader_A extends LineReader {
 				CMSubEnum cmSubEnum = new CMSubEnum();
 				cmSubEnum.setAccess(Access.PUBLIC);
 				cmSubEnum.setName(infos[0].trim());
+				cmSubEnum.setNote(notes.get(line));
 				subs.add(cmSubEnum);
 			});
 			cmEnum.setSubEnums(subs);
@@ -130,9 +142,6 @@ public final class ProtoReader_A extends LineReader {
 	protected void readFinish(IClasses classes) {
 		String className = "RepeatedUtils";
 		IClass utilsClass = classes.getClasses().get(className);
-		if (utilsClass != null) {
-			((CMImportGroup) utilsClass.getImportGroup()).addImport(CMStructBuilder.createCMImport(protoPackage + "." + protoName + ".*"));
-		}
 		CMInterface cmInterface = createProcessor(_package + ".processor", Utils.firstUpper(protoName) + "Processor");
 		classNames.forEach(name -> {
 			for (ISubEnum enu : classes.getEnums().get("MessageId").getSubEnums()) {
@@ -151,6 +160,20 @@ public final class ProtoReader_A extends LineReader {
 				}
 			}
 		});
+		if (utilsClass != null) {
+			((CMImportGroup) utilsClass.getImportGroup()).addImport(CMStructBuilder.createCMImport(protoPackage + "." + protoName + ".*"));
+			classes.getEnums().get("MessageId").getSubEnums().forEach(sub -> {
+				if (sub.getNote().startsWith("@") && sub.getNote().split("=")[1].trim().equals(protoName.replace("Protos", "")) && !sub.getName().startsWith("MI_SC")) {
+					CMMethod method = CMStructBuilder.createPublicCMMethod();
+					method.setAbstract(true);
+					method.setInterface(true);
+					method.setName("process" + Utils._ToUppercase(sub.getName().replaceFirst("MI_CS_", "").replaceFirst("MI_VO_", "")));
+					method.setReturnType(CMMethod.NONE_RETURN);
+					method.getParams().add(CMStructBuilder.createMethodParam("sender", "IMessageSender"));
+					cmInterface.getMethods().add(method);
+				}
+			});
+		}
 		if (cmInterface.getMethods().size() > 0) {
 			classes.getInterfaces().put(cmInterface.getName(), cmInterface);
 		}
