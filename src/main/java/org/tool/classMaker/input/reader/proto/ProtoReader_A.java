@@ -86,6 +86,7 @@ public final class ProtoReader_A extends LineReader {
 			} else {
 				structLines.add(line);
 				notes.put(line, note);
+				note = "";
 			}
 		}
 	}
