@@ -9,17 +9,21 @@ import org.tool.classMaker.struct.IClassesVisitor;
 final class ClassMaker {
 	
 	private static final String[] DEFAULT_ARGS = new String[] {
-			"D:/My_space/CrossGateProject/program/proto/proto_src", // url
-			"org.tool.classMaker.generator.java.GeneratorFactory", // factory
+//			"D:/My_space/CrossGateProject/program/proto/proto_src", // url
+			"D:/note/ErrorMessage.xlsx", // url
+			"org.tool.classMaker.generator.java.append.AppendGeneratorFactory", // factory
 //			"org.tool.classMaker.input.reader.excel.ConfReader_A:org.tool.classMaker.input.reader.excel.XLSXCreator;false", // reader
 //			"org.tool.classMaker.input.reader.excel.BeanReader_A:org.tool.classMaker.input.reader.excel.XLSXCreator", // reader
-			"org.tool.classMaker.input.reader.proto.ProtoReader_A:a", // reader
+//			"org.tool.classMaker.input.reader.proto.ProtoReader_A:a", // reader
+			"org.tool.classMaker.input.reader.excel.ErrorReader_A:org.tool.classMaker.input.reader.excel.XLSXCreator;false;D:/OP_space/data/excel/_ErrorMessage.xlsx;D:/OP_space/data/excel/_Text.xlsx;D:/OP_space/mmo.build/mmo.core/src/main/java/com/game2sky/publib/constants/CommonErrorCodeConstants.java", // reader
 //			"org.tool.classMaker.input.reader.xml.DomReader:org.tool.classMaker.input.reader.xml.JavaBindClassCreator_A", // reader
-			"D:/My_space/CrossGateBase/src/", // output dir
-			"cg.base.io.message", // package
-			"org.tool.classMaker.input.stream.FileStreamProvider:proto:MessageId;*", // inputProvider
-			"org.tool.classMaker.input.reader.proto.ProtoClassesVisitor_A", // classesVisitor
-//			"", // classesVisitor
+//			"D:/My_space/CrossGateBase/src/", // output dir
+			"D:/OP_space/mmo.build/mmo.core/src/main/java/", // output dir
+//			"cg.base.io.message", // package
+			"com.game2sky.publib.constants", // package
+			"org.tool.classMaker.input.stream.FileStreamProvider:.java:*", // inputProvider
+//			"org.tool.classMaker.input.reader.proto.ProtoClassesVisitor_A", // classesVisitor
+			"", // classesVisitor
 	};
 
 	public static void main(String[] args) {
@@ -28,7 +32,7 @@ final class ClassMaker {
 		Maker maker = new Maker();
 		try {
 			maker.setGeneratorFactory((IGeneratorFactory) Class.forName(args[1]).newInstance());
-			String[] readerInfos = args[2].split(":", -2);
+			String[] readerInfos = args[2].split(":", 2);
 			maker.setReader((IReader) Class.forName(readerInfos[0]).getConstructor(String.class).newInstance(readerInfos[1]));
 			maker.setOutputDir(args[3]);
 			maker.setPackage(args[4]);

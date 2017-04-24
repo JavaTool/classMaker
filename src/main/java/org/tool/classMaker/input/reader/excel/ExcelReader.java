@@ -25,18 +25,22 @@ public abstract class ExcelReader implements IReader {
 	}
 	
 	@Override
-	public void setPackage(String _package) {
+	public final void setPackage(String _package) {
 		this._package = _package;
 	}
 
 	@Override
 	public final void read(IClasses classes, InputStream inputStream) throws Exception {
-		Workbook workbook = excelLoaderCreator.load(inputStream);
+		Workbook workbook = read(inputStream);
 		for (int i = 0;i < (readAll ? 1 : workbook.getNumberOfSheets());i++) {
 			read(classes, workbook.getSheetAt(i), _package, i);
 		}
 	}
 	
 	protected abstract void read(IClasses classes, Sheet sheet, String _package, int index) throws Exception;
+	
+	protected final Workbook read(InputStream inputStream) throws Exception {
+		return excelLoaderCreator.load(inputStream);
+	}
 
 }
