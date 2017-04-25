@@ -79,8 +79,8 @@ public final class ErrorReader_A extends ExcelReader {
 					System.out.println("Exists staticName : " + errorInfo.staticName);
 				} else {
 					fields.add(errorInfo.toFiled());
-					errors.put(errorInfo.errorCode, errorInfo);
 				}
+				errors.put(errorInfo.errorCode, errorInfo);
 			}
 		}
 		cmClass.getAnnotations().addAll(lines);
