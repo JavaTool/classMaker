@@ -21,7 +21,6 @@ final class ClassGenerator implements IGenerator<IClass> {
 			if (line.startsWith("}")) {
 				t.getFields().forEach(field -> builder.append(fieldGenerator.generate(field, "\t")));
 			}
-			builder.append(LN);
 			builder.append(line).append(LN);
 		});
 		return builder.toString();
