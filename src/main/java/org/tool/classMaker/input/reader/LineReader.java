@@ -10,7 +10,7 @@ public abstract class LineReader implements IReader {
 
 	@Override
 	public final void read(IClasses classes, InputStream inputStream) throws Exception {
-		try (LineNumberReader reader = new LineNumberReader(new InputStreamReader(inputStream, CHAR_SET))) {
+		try (LineNumberReader reader = new LineNumberReader(new InputStreamReader(inputStream, "gbk"))) {
 			String line;
 			while ((line = reader.readLine()) != null) {
 				read(classes, line);
