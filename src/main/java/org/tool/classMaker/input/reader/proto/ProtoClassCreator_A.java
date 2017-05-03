@@ -216,7 +216,7 @@ class ClassCreator extends TypeCreator<CMClass> {
 	
 	private static CMClass createMessageSupper() {
 		CMClass cmClass = CMStructBuilder.createCMClass(0, 0);
-		cmClass.setPackage("org.tool.server.io.proto");
+		cmClass.setPackage("org.tool.server.io.message");
 		cmClass.setName("Message");
 		return cmClass;
 	}

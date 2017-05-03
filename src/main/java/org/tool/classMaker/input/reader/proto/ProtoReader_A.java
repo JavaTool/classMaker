@@ -185,7 +185,7 @@ public final class ProtoReader_A extends LineReader {
 		CMInterface cmInterface = CMStructBuilder.createCMInterface(0);
 		cmInterface.setPackage(_package);
 		cmInterface.setName("I" + name);
-		((CMImportGroup) cmInterface.getImportGroup()).addImport(CMStructBuilder.createCMImport("org.tool.server.io.proto.IMessageSender"));
+		((CMImportGroup) cmInterface.getImportGroup()).addImport(CMStructBuilder.createCMImport("org.tool.server.io.message.IMessageSender"));
 		return cmInterface;
 	}
 
