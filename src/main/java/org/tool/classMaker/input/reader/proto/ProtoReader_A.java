@@ -151,7 +151,7 @@ public final class ProtoReader_A extends LineReader {
 					CMMethod method = CMStructBuilder.createPublicCMMethod();
 					method.setAbstract(true);
 					method.setInterface(true);
-					method.setName("process" + inter.getName().replaceFirst("ICs", "").replaceFirst("IVo", ""));
+					method.setName("process" + inter.getName().replaceFirst("Cs", ""));
 					method.setReturnType(CMMethod.NONE_RETURN);
 					((CMImportGroup) cmInterface.getImportGroup()).addImport(CMStructBuilder.createCMImport(inter.getPackage() + "." + inter.getName()));
 					method.getParams().add(CMStructBuilder.createMethodParam("csMessage", inter.getName()));
