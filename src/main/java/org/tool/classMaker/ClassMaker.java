@@ -25,9 +25,39 @@ final class ClassMaker {
 //			"org.tool.classMaker.input.reader.proto.ProtoClassesVisitor_A", // classesVisitor
 			"", // classesVisitor
 	};
+	
+	protected static final String[] CG_EXCEL_ARGS = new String[] {
+			"D:/My_space/CrossGateResource", // url
+			"org.tool.classMaker.generator.java.GeneratorFactory", // factory
+			"org.tool.classMaker.input.reader.excel.ConfReader_A:org.tool.classMaker.input.reader.excel.XLSXCreator;false", // reader
+			"D:/My_space/CrossGateBase/src/", // output dir
+			"cg.base.conf", // package
+			"org.tool.classMaker.input.stream.FileStreamProvider:.xlsx:Conf_", // inputProvider
+			"", // classesVisitor
+	};
+	
+	protected static final String[] PROTO_ARGS = new String[] {
+			"D:/My_space/CrossGateProject/program/proto/proto_src", // url
+			"org.tool.classMaker.generator.java.GeneratorFactory", // factory
+			"org.tool.classMaker.input.reader.proto.ProtoReader_A:a", // reader
+			"D:/My_space/CrossGateBase/src/", // output dir
+			"cg.base.io.message", // package
+			"org.tool.classMaker.input.stream.FileStreamProvider:.proto:MessageId;*", // inputProvider
+			"org.tool.classMaker.input.reader.proto.ProtoClassesVisitor_A", // classesVisitor
+	};
+	
+	protected static final String[] OP_ERROR_ARGS = new String[] {
+			"D:/note/ErrorMessage.xlsx", // url
+			"org.tool.classMaker.generator.java.append.AppendGeneratorFactory", // factory
+			"org.tool.classMaker.input.reader.excel.ErrorReader_A:org.tool.classMaker.input.reader.excel.XLSXCreator;false;D:/OP_space/data/excel/_ErrorMessage.xlsx;D:/OP_space/data/excel/_Text.xlsx;D:/OP_space/mmo.build/mmo.core/src/main/java/com/game2sky/publib/constants/CommonErrorCodeConstants.java", // reader
+			"D:/OP_space/mmo.build/mmo.core/src/main/java/", // output dir
+			"com.game2sky.publib.constants", // package
+			"org.tool.classMaker.input.stream.FileStreamProvider:.java:*", // inputProvider
+			"", // classesVisitor
+	};
 
 	public static void main(String[] args) {
-		args = args.length < DEFAULT_ARGS.length ? DEFAULT_ARGS : args;
+		args = args.length < DEFAULT_ARGS.length ? CG_EXCEL_ARGS : args;
 		
 		Maker maker = new Maker();
 		try {

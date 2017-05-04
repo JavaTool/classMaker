@@ -70,9 +70,9 @@ final class SheetReader_A_Info implements ISheetReader {
 			inter.setNote(note);
 			classes.getInterfaces().put(inter.getName(), inter);
 			
-			CMClass clz = createCMClass(name, 0, _package);
+			CMClass clz = createCMClass(name, 0, _package, inter);
 			clz.setNote(note);
-			clz.setSuper(createCMClass(Utils.splitPackage(supper)[0], 0, Utils.splitPackage(supper)[1]));
+			clz.setSuper(createCMClass(Utils.splitPackage(supper)[0], 0, Utils.splitPackage(supper)[1], null));
 			List<String> annotationList = Lists.newArrayList(annotations);
 			clz.setAnnotations(annotationList);
 			List<IInterface> interfaceList = Lists.newArrayList(new IInterface[]{inter});
@@ -92,11 +92,14 @@ final class SheetReader_A_Info implements ISheetReader {
 		return inter;
 	}
 	
-	static CMClass createCMClass(String name, int fieldCount, String _package) {
+	static CMClass createCMClass(String name, int fieldCount, String _package, IInterface inter) {
 		CMClass clz = CMStructBuilder.createCMClass(fieldCount, fieldCount << 1);
 		clz.setName(name);
 		clz.setNote("This is a generator file.");
 		clz.setPackage(_package);
+		if (inter != null) {
+			clz.getInterfaces().add(inter);
+		}
 		return clz;
 	}
 	
@@ -128,7 +131,7 @@ final class SheetReader_A_Class implements ISheetReader {
 		}
 		CMClass clz = (CMClass) classes.getClasses().get(name);
 		if (clz == null) {
-			clz = SheetReader_A_Info.createCMClass(name, count, _package);
+			clz = SheetReader_A_Info.createCMClass(name, count, _package, inter);
 			classes.getClasses().put(clz.getName(), clz);
 		} else {
 			List<IField> fields = Lists.newArrayListWithCapacity(count);
