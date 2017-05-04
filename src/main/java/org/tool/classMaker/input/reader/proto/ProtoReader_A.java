@@ -147,7 +147,7 @@ public final class ProtoReader_A extends LineReader {
 		classNames.forEach(name -> {
 			for (ISubEnum enu : classes.getEnums().get("MessageId").getSubEnums()) {
 				if (!name.startsWith("SC_") && enu.getName().equals("MI_" + name)) {
-					IInterface inter = classes.getInterfaces().get("I" + Utils._ToUppercase(name));
+					IInterface inter = classes.getClasses().get(name);
 					CMMethod method = CMStructBuilder.createPublicCMMethod();
 					method.setAbstract(true);
 					method.setInterface(true);
@@ -170,6 +170,7 @@ public final class ProtoReader_A extends LineReader {
 					method.setInterface(true);
 					method.setName("process" + Utils._ToUppercase(sub.getName().replaceFirst("MI_CS_", "").replaceFirst("MI_VO_", "")));
 					method.setReturnType(CMMethod.NONE_RETURN);
+					method.getParams().add(CMStructBuilder.createMethodParam("serial", "int"));
 					method.getParams().add(CMStructBuilder.createMethodParam("sender", "IMessageSender"));
 					cmInterface.getMethods().add(method);
 				}
