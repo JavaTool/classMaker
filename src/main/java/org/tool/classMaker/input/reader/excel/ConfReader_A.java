@@ -7,7 +7,9 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.tool.classMaker.Utils;
 import org.tool.classMaker.input.struct.CMClass;
 import org.tool.classMaker.input.struct.CMField;
+import org.tool.classMaker.input.struct.CMImportGroup;
 import org.tool.classMaker.input.struct.CMInterface;
+import org.tool.classMaker.input.struct.CMMethod;
 import org.tool.classMaker.input.struct.CMStructBuilder;
 import org.tool.classMaker.struct.Access;
 import org.tool.classMaker.struct.IClasses;
@@ -136,7 +138,7 @@ final class SheetReader_A_Class implements ISheetReader {
 		} else {
 			List<IField> fields = Lists.newArrayListWithCapacity(count);
 			clz.setFields(fields);
-			List<IMethod> classMethods = Lists.newArrayListWithCapacity(count << 1);
+			List<IMethod> classMethods = Lists.newArrayListWithCapacity((count << 1) + 1);
 			clz.setMethods(classMethods);
 		}
 		
@@ -147,6 +149,36 @@ final class SheetReader_A_Class implements ISheetReader {
 			clz.getMethods().add(CMStructBuilder.createSetter(field));
 			inter.getMethods().add(CMStructBuilder.createGetterOfInterface(field));
 		}
+		clz.getMethods().add(createArrayFromExcel(clz, sheet));
+	}
+	
+	private static CMMethod createArrayFromExcel(CMClass clz, Sheet sheet) {
+		((CMImportGroup) clz.getImportGroup()).addImport(CMStructBuilder.createCMImport("org.tool.server.utils.ExcelUtil"));
+		CMMethod method = CMStructBuilder.createPublicCMMethod();
+		method.setName("arrayFromExcel");
+		method.setStatic(true);
+		method.getParams().add(CMStructBuilder.createMethodParam("provider", "cg.base.io.IExcelProvider"));
+		String className = clz.getName();
+		method.setReturnType(className + "[]");
+		method.getContents().add("org.apache.poi.ss.usermodel.Sheet sheet = provider.getWorkbook(\"" + className + "\").getSheetAt(0);");
+		method.getContents().add("int count = sheet.getLastRowNum();");
+		method.getContents().add(className + "[] array = new " + className + "[count - 3];");
+		method.getContents().add("for (int i = 3;i <= count;i++) {");
+		method.getContents().add("\torg.apache.poi.ss.usermodel.Row row = sheet.getRow(i);");
+		method.getContents().add("\tarray[i] = new " + className + "();");
+		Row enRow = sheet.getRow(1);
+		Row typeRow = sheet.getRow(2);
+		for (int i = 0;i < enRow.getLastCellNum();i++) {
+			StringBuilder builder = new StringBuilder();
+			builder.append("\t").append("array[i].set").append(Utils.firstUpper(enRow.getCell(i).getStringCellValue())).append("(");
+			String type = typeRow.getCell(i).getStringCellValue();
+			builder.append("ExcelUtil.readCellAs").append(Utils.firstUpper(type));
+			builder.append("(row.getCell(").append(i).append(")));");
+			method.getContents().add(builder.toString());
+		}
+		method.getContents().add("}");
+		method.getContents().add("return array;");
+		return method;
 	}
 	
 	private static CMField createCMField(Row cnRow, Row enRow, Row typeRow, int i) {
