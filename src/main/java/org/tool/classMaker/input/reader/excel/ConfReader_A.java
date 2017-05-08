@@ -165,7 +165,7 @@ final class SheetReader_A_Class implements ISheetReader {
 		method.getContents().add(className + "[] array = new " + className + "[count - 3];");
 		method.getContents().add("for (int i = 3;i <= count;i++) {");
 		method.getContents().add("\torg.apache.poi.ss.usermodel.Row row = sheet.getRow(i);");
-		method.getContents().add("\tarray[i] = new " + className + "();");
+		method.getContents().add("\tarray[i - 3] = new " + className + "();");
 		Row enRow = sheet.getRow(1);
 		Row typeRow = sheet.getRow(2);
 		for (int i = 0;i < enRow.getLastCellNum();i++) {
