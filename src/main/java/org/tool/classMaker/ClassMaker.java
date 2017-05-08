@@ -32,7 +32,7 @@ final class ClassMaker {
 			"org.tool.classMaker.input.reader.excel.ConfReader_A:org.tool.classMaker.input.reader.excel.XLSXCreator;false", // reader
 			"D:/My_space/CrossGateBase/src/", // output dir
 			"cg.base.conf", // package
-			"org.tool.classMaker.input.stream.FileStreamProvider:.xlsx:Conf_", // inputProvider
+			"org.tool.classMaker.input.stream.FileStreamProvider:.xlsx:Conf", // inputProvider
 			"", // classesVisitor
 	};
 	
