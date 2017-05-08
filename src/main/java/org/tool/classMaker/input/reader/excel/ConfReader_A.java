@@ -162,7 +162,7 @@ final class SheetReader_A_Class implements ISheetReader {
 		method.setReturnType(className + "[]");
 		method.getContents().add("org.apache.poi.ss.usermodel.Sheet sheet = provider.getWorkbook(\"" + className + "\").getSheetAt(0);");
 		method.getContents().add("int count = sheet.getLastRowNum();");
-		method.getContents().add(className + "[] array = new " + className + "[count - 3];");
+		method.getContents().add(className + "[] array = new " + className + "[count - 2];");
 		method.getContents().add("for (int i = 3, index = 0;i <= count;i++, index++) {");
 		method.getContents().add("\torg.apache.poi.ss.usermodel.Row row = sheet.getRow(i);");
 		method.getContents().add("\tarray[index] = new " + className + "();");
