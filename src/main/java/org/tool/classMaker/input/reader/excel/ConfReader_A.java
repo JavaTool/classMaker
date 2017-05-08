@@ -163,14 +163,14 @@ final class SheetReader_A_Class implements ISheetReader {
 		method.getContents().add("org.apache.poi.ss.usermodel.Sheet sheet = provider.getWorkbook(\"" + className + "\").getSheetAt(0);");
 		method.getContents().add("int count = sheet.getLastRowNum();");
 		method.getContents().add(className + "[] array = new " + className + "[count - 3];");
-		method.getContents().add("for (int i = 3;i <= count;i++) {");
+		method.getContents().add("for (int i = 3, index = 0;i <= count;i++, index++) {");
 		method.getContents().add("\torg.apache.poi.ss.usermodel.Row row = sheet.getRow(i);");
-		method.getContents().add("\tarray[i - 3] = new " + className + "();");
+		method.getContents().add("\tarray[index] = new " + className + "();");
 		Row enRow = sheet.getRow(1);
 		Row typeRow = sheet.getRow(2);
 		for (int i = 0;i < enRow.getLastCellNum();i++) {
 			StringBuilder builder = new StringBuilder();
-			builder.append("\t").append("array[i].set").append(Utils.firstUpper(enRow.getCell(i).getStringCellValue())).append("(");
+			builder.append("\t").append("array[index].set").append(Utils.firstUpper(enRow.getCell(i).getStringCellValue())).append("(");
 			String type = typeRow.getCell(i).getStringCellValue();
 			builder.append("ExcelUtil.readCellAs").append(Utils.firstUpper(type));
 			builder.append("(row.getCell(").append(i).append(")));");
