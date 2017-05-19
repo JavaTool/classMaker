@@ -41,7 +41,7 @@ class ClassCreator extends TypeCreator<CMClass> {
 			CMField field = createLineField(line);
 			boolean isRepeated = line.split("=")[0].replaceAll("\t", "").split(" ")[0].equals("repeated");
 			cmClass.getMethods().add(createGetter(field, isRepeated));
-			cmClass.getMethods().add(createSetter(field, isRepeated));
+			cmClass.getMethods().add(createSetter(field, isRepeated, className));
 		}
 		cmClass.getInterfaces().add(createInterface(classes, cmClass, name));
 		cmClass.getMethods().add(createBuildFromInterface(enumNames, name, cmClass));
@@ -67,7 +67,7 @@ class ClassCreator extends TypeCreator<CMClass> {
 				method.setInterface(true);
 				method.setName(m.getName());
 				method.setParams(m.getParams());
-				method.setReturnType(m.getReturnType());
+				method.setReturnType(m.getName().startsWith("set") ? inter.getName() : m.getReturnType());
 				method.setNote(m.getNote());
 				inter.getMethods().add(method);
 			}
@@ -126,10 +126,11 @@ class ClassCreator extends TypeCreator<CMClass> {
 		}
 	}
 	
-	private static CMMethod createSetter(IField field, boolean isRepeated) {
+	private static CMMethod createSetter(IField field, boolean isRepeated, String className) {
 		CMMethod method = CMStructBuilder.createSetter(field);
 		method.getContents().clear();
 		String type = field.getType();
+		method.setReturnType(className);
 		type = isRepeated ? type.split("<")[1].replace(">", "") : type;
 		String methodName = method.getName();
 		methodName = isRepeated ? methodName.replace("set", "addAll") : methodName;
@@ -139,6 +140,7 @@ class ClassCreator extends TypeCreator<CMClass> {
 		} else {
 			method.getContents().add("builder." + methodName + "(" + field.getName() + (isDefaultJavaType(type) ?  "" : ".build()") + ");");
 		}
+		method.getContents().add("return this;");
 		return method;
 	}
 	
