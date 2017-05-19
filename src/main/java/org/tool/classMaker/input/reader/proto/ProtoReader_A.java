@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.tool.classMaker.Utils;
-import org.tool.classMaker.input.reader.LineReader;
 import org.tool.classMaker.input.struct.CMClass;
 import org.tool.classMaker.input.struct.CMEnum;
 import org.tool.classMaker.input.struct.CMImportGroup;
@@ -19,76 +18,11 @@ import org.tool.classMaker.struct.IInterface;
 import org.tool.classMaker.struct.ISubEnum;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
-public final class ProtoReader_A extends LineReader {
-	
-	private final TypeCreator<CMClass> classCreator;
-	
-	private final TypeCreator<CMEnum> enumCreator;
-	
-	private final List<String> structLines;
-	
-	private final List<String> classNames;
-	
-	private String protoName;
-	
-	private String _package;
-	
-	private String protoPackage;
-	
-	private String note;
-	
-	private Map<String, String> notes;
+public final class ProtoReader_A extends ProtoReader {
 	
 	public ProtoReader_A(String protoName) {
-		this.protoName = protoName;
-		classCreator = new ClassCreator();
-		enumCreator = new EnumCreator();
-		structLines = Lists.newLinkedList();
-		classNames = Lists.newLinkedList();
-		notes = Maps.newHashMap();
-	}
-
-	@Override
-	public void setPackage(String _package) {
-		this._package = _package;
-	}
-
-	@Override
-	protected void read(IClasses classes, String line) throws Exception {
-		if (line.startsWith("message") || line.startsWith("enum")) {
-			structLines.add(line);
-			notes.clear();
-		} else if (line.startsWith("import ")) {
-			
-		} else if (line.trim().startsWith("//")) {
-			note = line.trim().substring(2).trim();
-		} else if (line.startsWith("option java_package ")) {
-			protoPackage = line.split("\"")[1];
-		} else if (line.startsWith("option java_outer_classname ")) {
-			protoName = line.split("\"")[1];
-		} else if (structLines.size() > 0 && line.trim().length() > 0 && !line.trim().startsWith("//")) {
-			if (line.trim().startsWith("{")) {
-				
-			} else if (line.trim().startsWith("}")) {
-				String[] infos = structLines.remove(0).split(" ");
-				String type = infos[0];
-				String name = infos[1].replace("{", "");
-				(type.startsWith("message") ? classCreator : enumCreator).setPackage(_package);
-				(type.startsWith("message") ? classCreator : enumCreator).setProtoName(protoName);
-				(type.startsWith("message") ? classCreator : enumCreator).setProtoPackage(protoPackage);
-				(type.startsWith("message") ? classCreator : enumCreator).create(classes, name, structLines, notes);
-				if (type.startsWith("message")) {
-					classNames.add(name);
-				}
-				structLines.clear();
-			} else {
-				structLines.add(line);
-				notes.put(line, note);
-				note = "";
-			}
-		}
+		super(protoName);
 	}
 	
 	abstract static class TypeCreator<T> {
@@ -188,6 +122,16 @@ public final class ProtoReader_A extends LineReader {
 		cmInterface.setName("I" + name);
 		((CMImportGroup) cmInterface.getImportGroup()).addImport(CMStructBuilder.createCMImport("org.tool.server.io.message.IMessageSender"));
 		return cmInterface;
+	}
+
+	@Override
+	protected TypeCreator<CMClass> createClassCreator() {
+		return new ClassCreator_A();
+	}
+
+	@Override
+	protected TypeCreator<CMEnum> createEnumCreator() {
+		return new EnumCreator();
 	}
 
 }

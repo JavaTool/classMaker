@@ -12,11 +12,11 @@ import org.tool.classMaker.struct.IClasses;
 
 import com.google.common.collect.Lists;
 
-final class RepeatedUtilsBuilder {
+final class JavaRepeatedUtilsBuilder {
 	
 	private String _package;
 	
-	public RepeatedUtilsBuilder(String _package) {
+	public JavaRepeatedUtilsBuilder(String _package) {
 		this._package = _package;
 	}
 	
