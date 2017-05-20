@@ -175,7 +175,7 @@ final class ClassCreator_C extends TypeCreator<CMClass> {
 		field.setName(infos[2]);
 		String type = transformCSharpType(infos[1]);
 		type = isDefaultCSharpType(type) ? type : "I" + type;
-		field.setType(infos[0].equals("repeated") ? "java.util.List<" + type + ">" : type);
+		field.setType(infos[0].equals("repeated") ? "System.Collections.Generic.IList<" + type + ">" : type);
 		field.setNote(line.contains("//") ? line.split("//")[1].trim() : field.getName());
 		return field;
 	}
