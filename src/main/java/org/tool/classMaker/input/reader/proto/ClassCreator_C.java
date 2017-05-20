@@ -129,11 +129,15 @@ final class ClassCreator_C extends TypeCreator<CMClass> {
 		String type = field.getType();
 		method.setReturnType("I" + className);
 		type = isRepeated ? type.split("<")[1].replace(">", "") : type;
-		String build = "msg." + field.getName() + " = ";
-		if (isRepeated && !isDefaultCSharpType(type)) {
-			method.getContents().add(build + "(RepeatedUtils.from" + type.substring(1) + "(" + field.getName() + "));");
+		String build = "msg." + field.getName();
+		if (isRepeated) {
+			if (isDefaultCSharpType(type)) {
+				method.getContents().add(build + ".AddRange(" + field.getName() + ");");
+			} else {
+				method.getContents().add(build + ".AddRange(RepeatedUtils.from" + type.substring(1) + "(" + field.getName() + "));");
+			}
 		} else {
-			method.getContents().add(build + "(" + field.getName() + (isDefaultCSharpType(type) ?  "" : ".build()") + ");");
+			method.getContents().add(build + " = " + field.getName() + (isDefaultCSharpType(type) ?  "" : ".build()") + ";");
 		}
 		method.getContents().add("return this;");
 		return method;
