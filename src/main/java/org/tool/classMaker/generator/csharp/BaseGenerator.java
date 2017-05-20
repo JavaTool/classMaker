@@ -6,7 +6,7 @@ import org.tool.classMaker.struct.IBase;
 public abstract class BaseGenerator<T extends IBase> implements IGenerator<T> {
 
 	public final String generate(T t, String tab) {
-		return generateBody(t, tab, generateBase(t, tab + "\t"));
+		return generateBody(t, tab + "\t", generateBase(t, tab + "\t"));
 	}
 	
 	protected abstract String generateBody(T t, String tab, String base);
@@ -25,6 +25,11 @@ public abstract class BaseGenerator<T extends IBase> implements IGenerator<T> {
 //			}
 //		}
 		builder.append(tab);
+		if (t.getAnnotations().size() == 1) {
+			if (t.getAnnotations().get(0).equals("override")) {
+				builder.append("override").append(BLANK);
+			}
+		}
 		generateHead(t, builder);
 		return builder.toString();
 	}

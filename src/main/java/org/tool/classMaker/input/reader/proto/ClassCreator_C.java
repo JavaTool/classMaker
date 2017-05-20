@@ -71,6 +71,7 @@ final class ClassCreator_C extends TypeCreator<CMClass> {
 		CMInterface inter = CMStructBuilder.createCMInterface(cmClass.getMethods().size());
 		inter.setName("I" + cmClass.getName());
 		inter.setFileType("cs");
+		inter.setPackage(_package + ".interfaces");
 		cmClass.getMethods().forEach(m -> {
 			if (m.getName().startsWith("get") || m.getName().startsWith("set")) {
 				CMMethod method = CMStructBuilder.createPublicCMMethod();
@@ -78,7 +79,7 @@ final class ClassCreator_C extends TypeCreator<CMClass> {
 				method.setInterface(true);
 				method.setName(m.getName());
 				method.setParams(m.getParams());
-				method.setReturnType(m.getName().startsWith("set") ? inter.getName() : m.getReturnType());
+				method.setReturnType(m.getReturnType());
 				method.setNote(m.getNote());
 				inter.getMethods().add(method);
 			}
@@ -126,7 +127,7 @@ final class ClassCreator_C extends TypeCreator<CMClass> {
 		CMMethod method = CMStructBuilder.createSetter(field);
 		method.getContents().clear();
 		String type = field.getType();
-		method.setReturnType(className);
+		method.setReturnType("I" + className);
 		type = isRepeated ? type.split("<")[1].replace(">", "") : type;
 		String build = "msg." + field.getName() + " = ";
 		if (isRepeated && !isDefaultCSharpType(type)) {
@@ -184,7 +185,7 @@ final class ClassCreator_C extends TypeCreator<CMClass> {
 		method.setName("toByteArray");
 		method.setReturnType("byte[]");
 		method.getContents().add("return cg.basis.utils.IOUtils.serializeProto(msg);");
-		method.getAnnotations().add("Override");
+		method.getAnnotations().add("override");
 		return method;
 	}
 	
@@ -225,7 +226,7 @@ final class ClassCreator_C extends TypeCreator<CMClass> {
 		CMMethod constructor = CMStructBuilder.createPublicCMMethod();
 		constructor.setName(className);
 		constructor.setReturnType(CMMethod.CONSTRUCTOR_RETURN);
-		constructor.getExceptions().add(CMStructBuilder.createMethodParam(enumNames.contains("MI_" + name) ? "base((int) MessageId.MI_" + name + ")" : "super(0)", ":"));
+		constructor.getExceptions().add(CMStructBuilder.createMethodParam(enumNames.contains("MI_" + name) ? "base((int) MessageId.MI_" + name + ")" : "base(0)", ":"));
 		return constructor;
 	}
 	

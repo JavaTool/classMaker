@@ -22,8 +22,8 @@ public abstract class TypeGenerator<T extends IInterface> extends AppendStaticFi
 	protected final String generateBody(final T t, final String tab, final String base) {
 		StringBuilder builder = new StringBuilder();
 		appendContentHead(builder, t, tab, base);
-		appendContentBody(builder, t, tab + "\t");
-		appendContentEnd(builder, t, tab + "\t");
+		appendContentBody(builder, t, tab);
+		appendContentEnd(builder, t, tab);
 		return builder.toString();
 	}
 	
@@ -38,11 +38,12 @@ public abstract class TypeGenerator<T extends IInterface> extends AppendStaticFi
 		String extendsText = generateExtends(t);
 		builder.append(getType()).append(BLANK).append(t.getName()).append(BLANK).append(extendsText).append(extendsText.length() > 0 ? BLANK : "");
 		appendInterface(builder, t);
+		builder.append(LN);
 		builder.append("\t").append("{").append(LN);
 	}
 	
 	private void appendContentBody(StringBuilder builder, T t, String tab) {
-		builder.append(generateFront(t, tab + "\t"));
+		builder.append(generateFront(t, tab));
 		appendFields(builder, t, tab);
 		appendMethods(builder, t, tab);
 		appendInners(builder, t, tab);
@@ -50,7 +51,8 @@ public abstract class TypeGenerator<T extends IInterface> extends AppendStaticFi
 	
 	private void appendContentEnd(StringBuilder builder, T t, String tab) {
 		builder.append(LN);
-		builder.append(tab).append("\t").append("}").append(LN);
+		builder.append(tab).append("}").append(LN);
+		builder.append(LN);
 		builder.append("}").append(LN);
 	}
 	
@@ -59,7 +61,7 @@ public abstract class TypeGenerator<T extends IInterface> extends AppendStaticFi
 			if (generateExtends(t).length() == 0) {
 				builder.append(getTypeInterface()).append(BLANK);
 			} else {
-				builder.append(", ").append(BLANK);
+				builder.append(",").append(BLANK);
 			}
 		}
 		for (IInterface inter : t.getInterfaces()) {
@@ -74,14 +76,14 @@ public abstract class TypeGenerator<T extends IInterface> extends AppendStaticFi
 	private void appendFields(StringBuilder builder, T t, String tab) {
 		IGenerator<IField> fieldGenerator = generatorFactory.createFieldGenerator();
 		for (IField field : t.getFields()) {
-			builder.append(fieldGenerator.generate(field, tab + "\t"));
+			builder.append(fieldGenerator.generate(field, tab));
 		}
 	}
 	
 	private void appendMethods(StringBuilder builder, T t, String tab) {
 		IGenerator<IMethod> methodGenerator = generatorFactory.createMethodGenerator();
 		for (IMethod method : t.getMethods()) {
-			builder.append(methodGenerator.generate(method, tab + "\t"));
+			builder.append(methodGenerator.generate(method, tab));
 		}
 	}
 	

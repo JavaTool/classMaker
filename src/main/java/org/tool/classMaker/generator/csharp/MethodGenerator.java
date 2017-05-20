@@ -10,10 +10,6 @@ final class MethodGenerator extends BaseGenerator<IMethod> {
 	protected String generateBody(IMethod t, String tab, String base) {
 		StringBuilder builder = new StringBuilder(LN);
 		builder.append(base);
-		// synchronized
-		if (t.isSynchronized()) {
-			builder.append("synchronized").append(BLANK);
-		}
 		// return
 		String returnType = t.getReturnType() != null && t.getReturnType().length() > 0 ? t.getReturnType() : "";
 		if (returnType.length() > 0) {

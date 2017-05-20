@@ -43,8 +43,10 @@ final class CSharpRepeatedUtilsBuilder {
 		param.setName("list");
 		param.setType("IList<I" + className + ">");
 		method.setParams(Lists.newArrayList(param));
-		method.getContents().add(returnType + " ret = new List<I" + className + ">();");
-		method.getContents().add("list.forEach(o => ret.Add(o.build()));");
+		method.getContents().add(returnType + " ret = new List<" + Utils.uppercaseTo_(className) + ">();");
+		method.getContents().add("foreach (" + className + " o in list) {");
+		method.getContents().add("\tret.Add(o.build());");
+		method.getContents().add("}");
 		method.getContents().add("return ret;");
 		return method;
 	}
@@ -61,7 +63,9 @@ final class CSharpRepeatedUtilsBuilder {
 		param.setType("IList<" + Utils.uppercaseTo_(className) + ">");
 		method.setParams(Lists.newArrayList(param));
 		method.getContents().add(returnType + " ret = new List<I" + className + ">();");
-		method.getContents().add("list.forEach(o => ret.Add(" + className + ".from(o)));");
+		method.getContents().add("foreach (" + Utils.uppercaseTo_(className) + " o in list) {");
+		method.getContents().add("\tret.Add(" + className + ".from(o));");
+		method.getContents().add("}");
 		method.getContents().add("return ret;");
 		return method;
 	}
@@ -69,14 +73,14 @@ final class CSharpRepeatedUtilsBuilder {
 	private IClass createRepeatedUtils() {
 		CMClass utilsClass = CMStructBuilder.createCMClass(0, 0);
 		utilsClass.setAccess(Access.PUBLIC);
-		utilsClass.setFinal(true);
 		utilsClass.setName("RepeatedUtils");
 		utilsClass.setPackage(_package + ".proto");
 		utilsClass.setFileType("cs");
 		
 		CMImportGroup importGroup = ((CMImportGroup) utilsClass.getImportGroup());
 		importGroup.addImport(CMStructBuilder.createCMImport("System.Collections.Generic"));
-		importGroup.addImport(CMStructBuilder.createCMImport(_package + ".interfaces.*"));
+		importGroup.addImport(CMStructBuilder.createCMImport(_package + ".interfaces"));
+		importGroup.addImport(CMStructBuilder.createCMImport("cg.basis.io.proto"));
 		return utilsClass;
 	}
 
