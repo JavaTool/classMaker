@@ -34,7 +34,7 @@ public final class Output {
 	}
 	
 	private static File createFile(File dir, IInterface inter) {
-		return new File(dir, inter.getPackage().replaceAll("\\.", "/") + "/" + inter.getName() + ".java");
+		return new File(dir, inter.getPackage().replaceAll("\\.", "/") + "/" + inter.getName() + "." + inter.getFileType());
 	}
 	
 	public static void output(String content, File file) throws Exception {

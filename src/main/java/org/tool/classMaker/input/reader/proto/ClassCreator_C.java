@@ -18,7 +18,7 @@ import org.tool.classMaker.struct.ISubEnum;
 
 import com.google.common.collect.Lists;
 
-public final class ClassCreator_C extends TypeCreator<CMClass> {
+final class ClassCreator_C extends TypeCreator<CMClass> {
 	
 	private static final CMClass SUPER = createMessageSupper();
 
@@ -31,6 +31,7 @@ public final class ClassCreator_C extends TypeCreator<CMClass> {
 		cmClass.setPackage(_package + ".proto");
 		cmClass.getFields().add(createBuilderField(name));
 		cmClass.setSuper(SUPER);
+		cmClass.setFileType("cs");
 		List<String> enumNames = transformSubEnums(classes.getEnums().get("MessageId").getSubEnums());
 		cmClass.getMethods().add(createConstructorDefault(enumNames, name, className));
 		cmClass.getMethods().add(createBuildFromBytes(enumNames, name, className));
@@ -46,13 +47,10 @@ public final class ClassCreator_C extends TypeCreator<CMClass> {
 		cmClass.getInterfaces().add(createInterface(classes, cmClass, name));
 		cmClass.getMethods().add(createBuildFromInterface(enumNames, name, cmClass));
 		CMImportGroup importGroup = ((CMImportGroup) cmClass.getImportGroup());
-		importGroup.addImport(CMStructBuilder.createCMImport(protoPackage + "." + protoName + ".*"));
-		importGroup.addImport(CMStructBuilder.createCMImport(_package + ".interfaces.*"));
-		if (enumNames.contains("MI_" + name)) {
-			importGroup.addImport(CMStructBuilder.createCMImport(protoPackage + ".MessageIdProto.MessageId"));
-		}
+		importGroup.addImport(CMStructBuilder.createCMImport(protoPackage));
+		importGroup.addImport(CMStructBuilder.createCMImport(_package + ".interfaces"));
 		classes.getClasses().put(name, cmClass);
-		new JavaRepeatedUtilsBuilder(_package).appendRepeatedUtils(classes, cmClass);
+		new CSharpRepeatedUtilsBuilder(_package).appendRepeatedUtils(classes, cmClass);
 		return cmClass;
 	}
 	
@@ -72,7 +70,7 @@ public final class ClassCreator_C extends TypeCreator<CMClass> {
 	private CMInterface createInterface(IClasses classes, CMClass cmClass, String name) {
 		CMInterface inter = CMStructBuilder.createCMInterface(cmClass.getMethods().size());
 		inter.setName("I" + cmClass.getName());
-		inter.setPackage(_package + ".interfaces");
+		inter.setFileType("cs");
 		cmClass.getMethods().forEach(m -> {
 			if (m.getName().startsWith("get") || m.getName().startsWith("set")) {
 				CMMethod method = CMStructBuilder.createPublicCMMethod();
@@ -86,7 +84,7 @@ public final class ClassCreator_C extends TypeCreator<CMClass> {
 			}
 		});
 		CMImportGroup importGroup = ((CMImportGroup) inter.getImportGroup());
-		importGroup.addImport(CMStructBuilder.createCMImport(protoPackage + "." + protoName + ".*"));
+		importGroup.addImport(CMStructBuilder.createCMImport(protoPackage));
 		CMMethod method = createBuildMethod(name);
 		method.setAbstract(true);
 		method.setInterface(true);
@@ -115,7 +113,7 @@ public final class ClassCreator_C extends TypeCreator<CMClass> {
 		type = isRepeated ? type.split("<")[1].replace(">", "") : type;
 		String methodName = method.getName();
 		methodName = isRepeated ? methodName + "List" : methodName;
-		String build = "msg." + methodName + "()";
+		String build = "msg." + field.getName();
 		if (isRepeated && !isDefaultCSharpType(type)) {
 			method.getContents().add("return RepeatedUtils.to" + type.substring(1) + "(" + build + ");");
 		} else {
@@ -130,12 +128,11 @@ public final class ClassCreator_C extends TypeCreator<CMClass> {
 		String type = field.getType();
 		method.setReturnType(className);
 		type = isRepeated ? type.split("<")[1].replace(">", "") : type;
-		String methodName = method.getName();
-		methodName = isRepeated ? methodName.replace("set", "addAll") : methodName;
+		String build = "msg." + field.getName() + " = ";
 		if (isRepeated && !isDefaultCSharpType(type)) {
-			method.getContents().add("builder." + methodName + "(RepeatedUtils.from" + type.substring(1) + "(" + field.getName() + "));");
+			method.getContents().add(build + "(RepeatedUtils.from" + type.substring(1) + "(" + field.getName() + "));");
 		} else {
-			method.getContents().add("builder." + methodName + "(" + field.getName() + (isDefaultCSharpType(type) ?  "" : ".build()") + ");");
+			method.getContents().add(build + "(" + field.getName() + (isDefaultCSharpType(type) ?  "" : ".build()") + ");");
 		}
 		method.getContents().add("return this;");
 		return method;
@@ -218,10 +215,9 @@ public final class ClassCreator_C extends TypeCreator<CMClass> {
 	
 	private static CMMethod createBuildFromBytes(List<String> enumNames, String name, String className) {
 		CMMethod method = createBuildFrom(className);
-		method.getContents().add("ret.msg = cg.basis.utils.IOUtils.deserializeProto(datas, typeof(" + className + "));");
+		method.getContents().add("ret.msg = cg.basis.utils.IOUtils.deserializeProto<" + name + ">(datas, typeof(" + name + "));");
 		method.getContents().add("return ret;");
 		method.getParams().add(CMStructBuilder.createMethodParam("datas", "byte[]"));
-		method.getExceptions().add(CMStructBuilder.createMethodParam("Exception", ""));
 		return method;
 	}
 	
@@ -229,7 +225,7 @@ public final class ClassCreator_C extends TypeCreator<CMClass> {
 		CMMethod constructor = CMStructBuilder.createPublicCMMethod();
 		constructor.setName(className);
 		constructor.setReturnType(CMMethod.CONSTRUCTOR_RETURN);
-		constructor.getExceptions().add(CMStructBuilder.createMethodParam(enumNames.contains("MI_" + name) ? "base(MessageId.MI_" + name + "_VALUE);" : "super(0);", ":"));
+		constructor.getExceptions().add(CMStructBuilder.createMethodParam(enumNames.contains("MI_" + name) ? "base((int) MessageId.MI_" + name + ")" : "super(0)", ":"));
 		return constructor;
 	}
 	
@@ -242,13 +238,12 @@ public final class ClassCreator_C extends TypeCreator<CMClass> {
 	private static IField createBuilderField(String type) {
 		CMField field = new CMField();
 		field.setAccess(Access.PRIVATE);
-		field.setFinal(true);
 		field.setName("msg");
 		field.setType(type);
 		field.setNeedGetter(true);
 		field.setNeedSetter(false);
 		field.setAnnotations(Lists.newLinkedList());
-		field.setDefaultValue(type + "()");
+		field.setDefaultValue("new " + type + "()");
 		return field;
 	}
 	

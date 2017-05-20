@@ -31,7 +31,7 @@ public abstract class TypeGenerator<T extends IInterface> extends AppendStaticFi
 		builder.append(LN);
 		builder.append(generatorFactory.createImportGroupGenerator().generate(t.getImportGroup(), tab));
 		if (t.getPackage().length() > 0) {
-			builder.append("namespace").append(BLANK).append(t.getPackage()).append(LN);
+			builder.append("namespace").append(BLANK).append(t.getPackage().replace("base", "basis")).append(LN);
 			builder.append("{").append(LN);
 		}
 		builder.append(base);
@@ -55,11 +55,15 @@ public abstract class TypeGenerator<T extends IInterface> extends AppendStaticFi
 	}
 	
 	private void appendInterface(StringBuilder builder, T t) {
-		if (t.getInterfaces().size() > 0 && generateExtends(t).length() == 0) {
-			builder.append(getTypeInterface()).append(BLANK);
+		if (t.getInterfaces().size() > 0) {
+			if (generateExtends(t).length() == 0) {
+				builder.append(getTypeInterface()).append(BLANK);
+			} else {
+				builder.append(", ").append(BLANK);
+			}
 		}
 		for (IInterface inter : t.getInterfaces()) {
-			builder.append(inter.getPackage()).append(inter.getPackage().length() > 0 ? "." : "").append(inter.getName()).append(",").append(BLANK);
+			builder.append(inter.getPackage().replace("base", "basis")).append(inter.getPackage().length() > 0 ? "." : "").append(inter.getName()).append(",").append(BLANK);
 		}
 		if (t.getInterfaces().size() > 0) {
 			builder.setLength(builder.length() - 2);

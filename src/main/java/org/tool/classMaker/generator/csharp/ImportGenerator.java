@@ -7,7 +7,7 @@ final class ImportGenerator implements IGenerator<IImport> {
 
 	@Override
 	public String generate(IImport t, String tab) {
-		return "using " + t.getContent();
+		return "using " + t.getContent().replace("base", "basis");
 	}
 
 }

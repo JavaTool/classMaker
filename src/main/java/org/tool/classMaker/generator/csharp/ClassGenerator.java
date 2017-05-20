@@ -21,7 +21,7 @@ final class ClassGenerator extends TypeGenerator<IClass> {
 
 	@Override
 	protected String generateExtends(IClass t) {
-		String supper = t.getSupper() == null ? null : t.getSupper().getPackage() + "." + t.getSupper().getName();
+		String supper = t.getSupper() == null ? null : t.getSupper().getPackage().replace("base", "basis") + "." + t.getSupper().getName();
 		return supper == null ? "" :": " + supper;
 	}
 

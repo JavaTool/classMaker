@@ -21,8 +21,7 @@ public final class ProtoReader_C extends ProtoReader {
 
 	@Override
 	protected TypeCreator<CMClass> createClassCreator() {
-		// TODO Auto-generated method stub
-		return null;
+		return new ClassCreator_C();
 	}
 
 	@Override
@@ -32,8 +31,7 @@ public final class ProtoReader_C extends ProtoReader {
 
 	@Override
 	protected void readFinish(IClasses classes) {
-		// TODO Auto-generated method stub
-
+		classNames.clear();
 	}
 	
 	private static class EnumCreator extends TypeCreator<CMEnum> {
@@ -44,6 +42,7 @@ public final class ProtoReader_C extends ProtoReader {
 			cmEnum.setAccess(Access.PUBLIC);
 			cmEnum.setName(name);
 			cmEnum.setPackage(_package);
+			cmEnum.setFileType("cs");
 			List<ISubEnum> subs = Lists.newArrayListWithCapacity(structLines.size());
 			structLines.forEach(line -> {
 				String[] infos = line.split("=");

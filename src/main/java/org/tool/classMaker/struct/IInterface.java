@@ -6,6 +6,8 @@ public interface IInterface extends IBase {
 	
 	String getPackage();
 	
+	String getFileType();
+	
 	List<IMethod> getMethods();
 	
 	List<IField> getFields();

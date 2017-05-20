@@ -11,6 +11,8 @@ public class CMInterface extends CMBase implements IInterface {
 	
 	private String _package;
 	
+	private String fileType = "java";
+	
 	private List<IMethod> methods;
 	
 	private List<IField> fields;
@@ -73,6 +75,15 @@ public class CMInterface extends CMBase implements IInterface {
 
 	public void setImportGroup(IImportGroup importGroup) {
 		this.importGroup = importGroup;
+	}
+
+	@Override
+	public String getFileType() {
+		return fileType;
+	}
+
+	public void setFileType(String fileType) {
+		this.fileType = fileType;
 	}
 
 }

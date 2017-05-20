@@ -37,7 +37,7 @@ final class ClassMaker {
 	};
 	
 	protected static final String[] PROTO_ARGS = new String[] {
-			"D:/My_space/CrossGateProject/program/proto/proto_src", // url
+			"D:/My_space/CrossGateProject/program/proto/proto", // url
 			"org.tool.classMaker.generator.java.GeneratorFactory", // factory
 			"org.tool.classMaker.input.reader.proto.ProtoReader_A:a", // reader
 			"D:/My_space/CrossGateBase/src/", // output dir
@@ -55,9 +55,19 @@ final class ClassMaker {
 			"org.tool.classMaker.input.stream.FileStreamProvider:.java:*", // inputProvider
 			"", // classesVisitor
 	};
+	
+	protected static final String[] CSHARP_ARGS = new String[] {
+			"D:/My_space/CrossGateProject/program/proto/proto", // url
+			"org.tool.classMaker.generator.csharp.GeneratorFactory", // factory
+			"org.tool.classMaker.input.reader.proto.ProtoReader_C:a", // reader
+			"D:/My_space/CrossGateClient_Unity/Assets/Scripts/", // output dir
+			"cg.base.io.message", // package
+			"org.tool.classMaker.input.stream.FileStreamProvider:.proto:MessageId;*", // inputProvider
+			"org.tool.classMaker.input.reader.proto.ProtoClassesVisitor_A", // classesVisitor
+	};
 
 	public static void main(String[] args) {
-		args = args.length < DEFAULT_ARGS.length ? CG_EXCEL_ARGS : args;
+		args = args.length < DEFAULT_ARGS.length ? CSHARP_ARGS : args;
 		
 		Maker maker = new Maker();
 		try {
