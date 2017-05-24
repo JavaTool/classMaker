@@ -32,6 +32,9 @@ final class ClassCreator_C extends TypeCreator<CMClass> {
 		cmClass.getFields().add(createBuilderField(name));
 		cmClass.setSuper(SUPER);
 		cmClass.setFileType("cs");
+		if (!name.startsWith("VO_")) {
+			cmClass.getAnnotations().add("[ProtoMessage((int) MessageId.MI_" + name + ")]");
+		}
 		List<String> enumNames = transformSubEnums(classes.getEnums().get("MessageId").getSubEnums());
 		cmClass.getMethods().add(createConstructorDefault(enumNames, name, className));
 		cmClass.getMethods().add(createBuildFromBytes(enumNames, name, className));

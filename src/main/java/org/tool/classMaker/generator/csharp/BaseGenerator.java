@@ -19,16 +19,17 @@ public abstract class BaseGenerator<T extends IBase> implements IGenerator<T> {
 			builder.append(tab).append(" * ").append(note).append(LN);
 			builder.append(tab).append(" */").append(LN);
 		}
-//		if (t.getAnnotations() != null) {
-//			for (String annotation : t.getAnnotations()) {
-//				builder.append(tab).append("@").append(annotation).append(LN);
-//			}
-//		}
-		builder.append(tab);
 		if (t.getAnnotations().size() == 1) {
-			if (t.getAnnotations().get(0).equals("override")) {
-				builder.append("override").append(BLANK);
+			String annotation = t.getAnnotations().get(0);
+			if (annotation.equals("override")) {
+				builder.append(tab);
+				builder.append(annotation).append(BLANK);
+			} else {
+				builder.append(tab).append(annotation).append(LN);
+				builder.append(tab);
 			}
+		} else {
+			builder.append(tab);
 		}
 		generateHead(t, builder);
 		return builder.toString();
