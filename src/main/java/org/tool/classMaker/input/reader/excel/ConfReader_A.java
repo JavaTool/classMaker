@@ -146,7 +146,9 @@ final class SheetReader_A_Class implements ISheetReader {
 		
 		ListMultimap<String, Integer> fieldListMap = LinkedListMultimap.create();
 		for (int i = 0;i < count;i++) {
-			fieldListMap.put(enRow.getCell(i).getStringCellValue(), i);
+			if (enRow.getCell(i) != null) {
+				fieldListMap.put(enRow.getCell(i).getStringCellValue(), i);
+			}
 		}
 		
 		for (String fieldName : fieldListMap.keySet()) {
