@@ -18,6 +18,8 @@ import org.tool.classMaker.struct.IInterface;
 import org.tool.classMaker.struct.IMethod;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 
 public final class ConfReader_A extends ExcelReader {
@@ -142,17 +144,27 @@ final class SheetReader_A_Class implements ISheetReader {
 			clz.setMethods(classMethods);
 		}
 		
+		ListMultimap<String, Integer> fieldListMap = LinkedListMultimap.create();
 		for (int i = 0;i < count;i++) {
-			CMField field = createCMField(cnRow, enRow, typeRow, i);
+			fieldListMap.put(enRow.getCell(i).getStringCellValue(), i);
+		}
+		
+		for (String fieldName : fieldListMap.keySet()) {
+			List<Integer> indexList = fieldListMap.get(fieldName);
+			CMField field = createCMField(cnRow, enRow, typeRow, indexList.get(0));
+			if (indexList.size() > 1) {
+				field.setType(field.getType() + "[]");
+			}
 			clz.getFields().add(field);
 			clz.getMethods().add(CMStructBuilder.createGetter(field));
 			clz.getMethods().add(CMStructBuilder.createSetter(field));
 			inter.getMethods().add(CMStructBuilder.createGetterOfInterface(field));
 		}
-		clz.getMethods().add(createArrayFromExcel(clz, sheet));
+		
+		clz.getMethods().add(createArrayFromExcel(clz, sheet, fieldListMap));
 	}
 	
-	private static CMMethod createArrayFromExcel(CMClass clz, Sheet sheet) {
+	private static CMMethod createArrayFromExcel(CMClass clz, Sheet sheet, ListMultimap<String, Integer> fieldListMap) {
 		((CMImportGroup) clz.getImportGroup()).addImport(CMStructBuilder.createCMImport("org.tool.server.utils.ExcelUtil"));
 		CMMethod method = CMStructBuilder.createPublicCMMethod();
 		method.setName("arrayFromExcel");
@@ -166,14 +178,26 @@ final class SheetReader_A_Class implements ISheetReader {
 		method.getContents().add("for (int i = 3, index = 0;i <= count;i++, index++) {");
 		method.getContents().add("\torg.apache.poi.ss.usermodel.Row row = sheet.getRow(i);");
 		method.getContents().add("\tarray[index] = new " + className + "();");
-		Row enRow = sheet.getRow(1);
 		Row typeRow = sheet.getRow(2);
-		for (int i = 0;i < enRow.getLastCellNum();i++) {
-			StringBuilder builder = new StringBuilder();
-			builder.append("\t").append("array[index].set").append(Utils.firstUpper(enRow.getCell(i).getStringCellValue())).append("(");
-			String type = typeRow.getCell(i).getStringCellValue();
-			builder.append("ExcelUtil.readCellAs").append(Utils.firstUpper(type));
-			builder.append("(row.getCell(").append(i).append(")));");
+		StringBuilder builder = new StringBuilder();
+		for (String fieldName : fieldListMap.keySet()) {
+			builder.setLength(0);
+			List<Integer> indexList = fieldListMap.get(fieldName);
+			builder.append("\t").append("array[index].set");
+			builder.append(Utils.firstUpper(fieldName)).append("(");
+			String type = typeRow.getCell(indexList.get(0)).getStringCellValue();
+			if (indexList.size() > 1) {
+				builder.append("new ").append(type).append("[]{");
+				for (Integer index : indexList) {
+					builder.append("ExcelUtil.readCellAs").append(Utils.firstUpper(type));
+					builder.append("(row.getCell(").append(index).append(")), ");
+				}
+				builder.setLength(builder.length() - 2);
+				builder.append("});");
+			} else {
+				builder.append("ExcelUtil.readCellAs").append(Utils.firstUpper(type));
+				builder.append("(row.getCell(").append(indexList.get(0)).append(")));");
+			}
 			method.getContents().add(builder.toString());
 		}
 		method.getContents().add("}");
