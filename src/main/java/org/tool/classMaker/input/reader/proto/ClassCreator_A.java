@@ -42,6 +42,9 @@ class ClassCreator_A extends TypeCreator<CMClass> {
 			boolean isRepeated = line.split("=")[0].replaceAll("\t", "").split(" ")[0].equals("repeated");
 			cmClass.getMethods().add(createGetter(field, isRepeated));
 			cmClass.getMethods().add(createSetter(field, isRepeated, className));
+			if (isRepeated) {
+				cmClass.getMethods().add(createAdder(createField(line), className));
+			}
 		}
 		cmClass.getInterfaces().add(createInterface(classes, cmClass, name));
 		cmClass.getMethods().add(createBuildFromInterface(enumNames, name, cmClass));
@@ -61,13 +64,13 @@ class ClassCreator_A extends TypeCreator<CMClass> {
 		inter.setName("I" + cmClass.getName());
 		inter.setPackage(_package + ".interfaces");
 		cmClass.getMethods().forEach(m -> {
-			if (m.getName().startsWith("get") || m.getName().startsWith("set")) {
+			if (m.getName().startsWith("get") || m.getName().startsWith("set") || m.getName().startsWith("add")) {
 				CMMethod method = CMStructBuilder.createPublicCMMethod();
 				method.setAbstract(true);
 				method.setInterface(true);
 				method.setName(m.getName());
 				method.setParams(m.getParams());
-				method.setReturnType(m.getName().startsWith("set") ? inter.getName() : m.getReturnType());
+				method.setReturnType(m.getName().startsWith("get") ? m.getReturnType() : inter.getName());
 				method.setNote(m.getNote());
 				inter.getMethods().add(method);
 			}
@@ -144,6 +147,18 @@ class ClassCreator_A extends TypeCreator<CMClass> {
 		return method;
 	}
 	
+	private static CMMethod createAdder(IField field, String className) {
+		CMMethod method = CMStructBuilder.createAdder(field);
+		method.getContents().clear();
+		String type = field.getType();
+		method.setReturnType(className);
+		String methodName = method.getName();
+		method.getAnnotations().add("Override");
+		method.getContents().add("builder." + methodName + "(" + field.getName() + (isDefaultJavaType(type) ?  "" : ".build()") + ");");
+		method.getContents().add("return this;");
+		return method;
+	}
+	
 	private static CMField createLineField(String line) {
 		String[] infos = line.split("=")[0].replaceAll("\t", "").split(" ");
 		CMField field = new CMField();
@@ -151,6 +166,17 @@ class ClassCreator_A extends TypeCreator<CMClass> {
 		String type = transformJavaType(infos[1]);
 		type = isDefaultJavaType(type) ? type : "I" + type;
 		field.setType(infos[0].equals("repeated") ? "java.util.List<" + baseTypeToPackageType(type) + ">" : type);
+		field.setNote(line.contains("//") ? line.split("//")[1].trim() : field.getName());
+		return field;
+	}
+	
+	private static CMField createField(String line) {
+		String[] infos = line.split("=")[0].replaceAll("\t", "").split(" ");
+		CMField field = new CMField();
+		field.setName(infos[2]);
+		String type = transformJavaType(infos[1]);
+		type = isDefaultJavaType(type) ? type : "I" + type;
+		field.setType(type);
 		field.setNote(line.contains("//") ? line.split("//")[1].trim() : field.getName());
 		return field;
 	}

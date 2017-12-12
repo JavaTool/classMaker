@@ -86,6 +86,18 @@ public final class CMStructBuilder {
 		return method;
 	}
 	
+	public static CMMethod createAdder(IField field) {
+		CMMethod method = createPublicCMMethod();
+		method.setName("add" + Utils.firstUpper(field.getName()));
+		List<String> contents = Lists.newArrayList("this." + field.getName() + " = " + field.getName() + ";");
+		method.setContents(contents);
+		method.setNote("Adder of " + field.getNote());
+		List<IField> params = Lists.newArrayList(field);
+		method.setParams(params);
+		method.setReturnType(IMethod.NONE_RETURN);
+		return method;
+	}
+	
 	public static CMMethod createPublicCMMethod() {
 		CMMethod method = new CMMethod();
 		method.setAccess(Access.PUBLIC);
