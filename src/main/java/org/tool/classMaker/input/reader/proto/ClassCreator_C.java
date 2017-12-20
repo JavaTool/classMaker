@@ -117,7 +117,7 @@ final class ClassCreator_C extends TypeCreator<CMClass> {
 		type = isRepeated ? type.split("<")[1].replace(">", "") : type;
 		String methodName = method.getName();
 		methodName = isRepeated ? methodName + "List" : methodName;
-		String build = "msg." + field.getName();
+		String build = "msg == null ? " + getReturn(type, isRepeated) + " : msg." + field.getName();
 		if (isRepeated && !isDefaultCSharpType(type)) {
 			method.getContents().add("return RepeatedUtils.to" + type.substring(1) + "(" + build + ");");
 		} else {
@@ -144,6 +144,28 @@ final class ClassCreator_C extends TypeCreator<CMClass> {
 		}
 		method.getContents().add("return this;");
 		return method;
+	}
+	
+	static String getReturn(String type, boolean isRepeated) {
+		if (isRepeated) {
+			return "null";
+		}
+		switch (type) {
+		case "string" : 
+			return "\"\"";
+		case "int" : 
+			return "0";
+		case "long" : 
+			return "0";
+		case "bool" : 
+			return "false";
+		case "float" : 
+			return "0";
+		case "double" : 
+			return "0";
+		default : 
+			return "null";
+		}
 	}
 	
 	static boolean isDefaultCSharpType(String type) {
