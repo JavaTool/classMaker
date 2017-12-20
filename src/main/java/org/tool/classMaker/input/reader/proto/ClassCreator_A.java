@@ -138,6 +138,11 @@ class ClassCreator_A extends TypeCreator<CMClass> {
 		String methodName = method.getName();
 		methodName = isRepeated ? methodName.replace("set", "addAll") : methodName;
 		method.getAnnotations().add("Override");
+		if (isRepeated || !isDefaultJavaType(type)) {
+			method.getContents().add("if (" + field.getName() + " == null) {");
+			method.getContents().add("\treturn this;");
+			method.getContents().add("}");
+		}
 		if (isRepeated && !isDefaultJavaType(type)) {
 			method.getContents().add("builder." + methodName + "(RepeatedUtils.from" + type.substring(1) + "(" + field.getName() + "));");
 		} else {
@@ -154,6 +159,11 @@ class ClassCreator_A extends TypeCreator<CMClass> {
 		method.setReturnType(className);
 		String methodName = method.getName();
 		method.getAnnotations().add("Override");
+		if (!isDefaultJavaType(type)) {
+			method.getContents().add("if (" + field.getName() + " == null) {");
+			method.getContents().add("\treturn this;");
+			method.getContents().add("}");
+		}
 		method.getContents().add("builder." + methodName + "(" + field.getName() + (isDefaultJavaType(type) ?  "" : ".build()") + ");");
 		method.getContents().add("return this;");
 		return method;
