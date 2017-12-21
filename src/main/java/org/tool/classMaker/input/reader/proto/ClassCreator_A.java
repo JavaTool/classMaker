@@ -328,7 +328,7 @@ class ClassCreator_A extends TypeCreator<CMClass> {
 		CMMethod method = CMStructBuilder.createPublicCMMethod();
 		method.setName("toString");
 		method.setReturnType("String");
-		method.getContents().add("return com.google.protobuf.TextFormat.shortDebugString(build());");
+		method.getContents().add("return cg.base.io.message.MessageUtils.printToJsonString(build());");
 		method.getAnnotations().add("Override");
 		return method;
 	}
