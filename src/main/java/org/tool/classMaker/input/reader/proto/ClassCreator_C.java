@@ -62,11 +62,11 @@ final class ClassCreator_C extends TypeCreator<CMClass> {
 		cmClass.getMethods().forEach(m -> {
 			if (m.getName().startsWith("get")) {
 				String fieldName = m.getName().replaceFirst("get", "");
-				method.getContents().add("ret.set" + fieldName + "(vo.get" + fieldName + "());");
+				method.getContents().add("ret.set" + fieldName + "(param.get" + fieldName + "());");
 			}
 		});
 		method.getContents().add("return ret;");
-		method.getParams().add(CMStructBuilder.createMethodParam("vo", "I" + cmClass.getName()));
+		method.getParams().add(CMStructBuilder.createMethodParam("param", "I" + cmClass.getName()));
 		return method;
 	}
 	
@@ -228,9 +228,9 @@ final class ClassCreator_C extends TypeCreator<CMClass> {
 	
 	private static CMMethod createBuildFromProto(List<String> enumNames, String name, String className) {
 		CMMethod method = createBuildFrom(className);
-		method.getContents().add("ret.msg = proto;");
+		method.getContents().add("ret.msg = param;");
 		method.getContents().add("return ret;");
-		method.getParams().add(CMStructBuilder.createMethodParam("proto", name));
+		method.getParams().add(CMStructBuilder.createMethodParam("param", name));
 		return method;
 	}
 	
@@ -239,15 +239,18 @@ final class ClassCreator_C extends TypeCreator<CMClass> {
 		method.setName("from");
 		method.setReturnType(className);
 		method.setStatic(true);
+		method.getContents().add("if (param == null) {");
+		method.getContents().add("\treturn null;");
+		method.getContents().add("}");
 		method.getContents().add(className + " ret = new " + className + "();");
 		return method;
 	}
 	
 	private static CMMethod createBuildFromBytes(List<String> enumNames, String name, String className) {
 		CMMethod method = createBuildFrom(className);
-		method.getContents().add("ret.msg = cg.basis.utils.IOUtils.deserializeProto<" + name + ">(datas, typeof(" + name + "));");
+		method.getContents().add("ret.msg = cg.basis.utils.IOUtils.deserializeProto<" + name + ">(param, typeof(" + name + "));");
 		method.getContents().add("return ret;");
-		method.getParams().add(CMStructBuilder.createMethodParam("datas", "byte[]"));
+		method.getParams().add(CMStructBuilder.createMethodParam("param", "byte[]"));
 		return method;
 	}
 	

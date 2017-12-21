@@ -46,6 +46,7 @@ class ClassCreator_A extends TypeCreator<CMClass> {
 				cmClass.getMethods().add(createAdder(createField(line), className));
 			}
 		}
+		cmClass.getMethods().add(createToStringMethod());
 		cmClass.getInterfaces().add(createInterface(classes, cmClass, name));
 		cmClass.getMethods().add(createBuildFromInterface(enumNames, name, cmClass));
 		CMImportGroup importGroup = ((CMImportGroup) cmClass.getImportGroup());
@@ -320,6 +321,15 @@ class ClassCreator_A extends TypeCreator<CMClass> {
 		method.setName("build");
 		method.setReturnType(name);
 		method.getContents().add("return builder.build();");
+		return method;
+	}
+	
+	private static CMMethod createToStringMethod() {
+		CMMethod method = CMStructBuilder.createPublicCMMethod();
+		method.setName("toString");
+		method.setReturnType("String");
+		method.getContents().add("return com.google.protobuf.TextFormat.shortDebugString(build());");
+		method.getAnnotations().add("Override");
 		return method;
 	}
 	
