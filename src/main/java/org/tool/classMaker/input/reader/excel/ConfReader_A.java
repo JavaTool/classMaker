@@ -203,6 +203,7 @@ final class SheetReader_A_Class implements ISheetReader {
 			method.getContents().add(builder.toString());
 		}
 		method.getContents().add("}");
+		method.getContents().add("sheet = null;");
 		method.getContents().add("return array;");
 		return method;
 	}
