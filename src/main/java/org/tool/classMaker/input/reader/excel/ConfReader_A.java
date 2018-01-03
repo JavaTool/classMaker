@@ -226,7 +226,7 @@ final class SheetReader_A_Class implements ISheetReader {
 		method.getContents().add("int count = texts.length;");
 		method.getContents().add(className + "[] array = new " + className + "[count];");
 		method.getContents().add("for (int i = 0;i < count;i++) {");
-		method.getContents().add("\tString[] infos = texts[i].split(\"\\t\");");
+		method.getContents().add("\tString[] infos = texts[i].split(\"\\t\", -2);");
 		method.getContents().add("\tarray[i] = new " + className + "();");
 		Row typeRow = sheet.getRow(2);
 		StringBuilder builder = new StringBuilder();
