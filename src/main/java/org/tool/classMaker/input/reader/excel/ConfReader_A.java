@@ -165,6 +165,10 @@ final class SheetReader_A_Class implements ISheetReader {
 		
 		clz.getMethods().add(createArrayFromExcel(clz, sheet, fieldListMap));
 		clz.getMethods().add(createArrayFromText(clz, sheet, fieldListMap));
+		
+		((CMImportGroup) clz.getImportGroup()).addImport(CMStructBuilder.createCMImport("java.util.List"));
+		((CMImportGroup) clz.getImportGroup()).addImport(CMStructBuilder.createCMImport("com.google.common.collect.Lists"));
+		((CMImportGroup) clz.getImportGroup()).addImport(CMStructBuilder.createCMImport("com.google.common.collect.ImmutableList"));
 	}
 	
 	private static CMMethod createArrayFromExcel(CMClass clz, Sheet sheet, ListMultimap<String, Integer> fieldListMap) {
@@ -174,22 +178,23 @@ final class SheetReader_A_Class implements ISheetReader {
 		method.setStatic(true);
 		method.getParams().add(CMStructBuilder.createMethodParam("provider", "cg.base.io.IExcelProvider"));
 		String className = clz.getName();
-		method.setReturnType(className + "[]");
+		String returnType = "I" + className;
+		method.setReturnType("List<" + returnType + ">");
 		method.getContents().add("org.apache.poi.ss.usermodel.Sheet sheet = provider.getWorkbook(\"" + className + "\").getSheetAt(0);");
 		method.getContents().add("if (sheet == null) {");
 		method.getContents().add("\treturn null;");
 		method.getContents().add("}");
 		method.getContents().add("int count = sheet.getLastRowNum();");
-		method.getContents().add(className + "[] array = new " + className + "[count - 2];");
-		method.getContents().add("for (int i = 3, index = 0;i <= count;i++, index++) {");
+		method.getContents().add("List<" + returnType + "> list = Lists.newArrayListWithCapacity(count - 2);");
+		method.getContents().add("for (int i = 3;i <= count;i++) {");
 		method.getContents().add("\torg.apache.poi.ss.usermodel.Row row = sheet.getRow(i);");
-		method.getContents().add("\tarray[index] = new " + className + "();");
+		method.getContents().add("\t" + className + " e = new " + className + "();");
 		Row typeRow = sheet.getRow(2);
 		StringBuilder builder = new StringBuilder();
 		for (String fieldName : fieldListMap.keySet()) {
 			builder.setLength(0);
 			List<Integer> indexList = fieldListMap.get(fieldName);
-			builder.append("\t").append("array[index].set");
+			builder.append("\t").append("e.set");
 			builder.append(Utils.firstUpper(fieldName)).append("(");
 			String type = typeRow.getCell(indexList.get(0)).getStringCellValue();
 			if (indexList.size() > 1) {
@@ -206,9 +211,10 @@ final class SheetReader_A_Class implements ISheetReader {
 			}
 			method.getContents().add(builder.toString());
 		}
+		method.getContents().add("\tlist.add(e);");
 		method.getContents().add("}");
 		method.getContents().add("sheet = null;");
-		method.getContents().add("return array;");
+		method.getContents().add("return ImmutableList.copyOf(list);");
 		return method;
 	}
 	
@@ -218,23 +224,27 @@ final class SheetReader_A_Class implements ISheetReader {
 		method.setStatic(true);
 		method.getParams().add(CMStructBuilder.createMethodParam("provider", "cg.base.io.ITextProvider"));
 		String className = clz.getName();
-		method.setReturnType(className + "[]");
+		String returnType = "I" + className;
+		method.setReturnType("List<" + returnType + ">");
 		method.getContents().add("String[] texts = provider.getTextResource(\"" + className.replaceAll("Conf", "") + "\");");
 		method.getContents().add("if (texts == null) {");
 		method.getContents().add("\treturn null;");
 		method.getContents().add("}");
 		method.getContents().add("int count = texts.length;");
-		method.getContents().add(className + "[] array = new " + className + "[count];");
+		method.getContents().add("List<" + returnType + "> list = Lists.newArrayListWithCapacity(count);");
 		method.getContents().add("for (int i = 0;i < count;i++) {");
+		method.getContents().add("\tif (texts[i].startsWith(\"#\") || texts[i].trim().length() == 0) {");
+		method.getContents().add("\t\tcontinue;");
+		method.getContents().add("\t}");
 		method.getContents().add("\tString[] infos = texts[i].split(\"\\t\", -2);");
-		method.getContents().add("\tarray[i] = new " + className + "();");
+		method.getContents().add("\t" + className + " e = new " + className + "();");
 		Row typeRow = sheet.getRow(2);
 		StringBuilder builder = new StringBuilder();
 		boolean needUtil = false;
 		for (String fieldName : fieldListMap.keySet()) {
 			builder.setLength(0);
 			List<Integer> indexList = fieldListMap.get(fieldName);
-			builder.append("\t").append("array[i].set");
+			builder.append("\t").append("e.set");
 			builder.append(Utils.firstUpper(fieldName)).append("(");
 			String type = typeRow.getCell(indexList.get(0)).getStringCellValue();
 			String methodName = type.equals("String") ? "" : ("MathUtil.stringTo" + Utils.firstUpper(type));
@@ -258,9 +268,10 @@ final class SheetReader_A_Class implements ISheetReader {
 		if (needUtil) {
 			((CMImportGroup) clz.getImportGroup()).addImport(CMStructBuilder.createCMImport("cg.base.util.MathUtil"));
 		}
+		method.getContents().add("\tlist.add(e);");
 		method.getContents().add("}");
 		method.getContents().add("texts = null;");
-		method.getContents().add("return array;");
+		method.getContents().add("return ImmutableList.copyOf(list);");
 		return method;
 	}
 	
