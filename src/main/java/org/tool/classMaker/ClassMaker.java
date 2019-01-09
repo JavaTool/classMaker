@@ -66,8 +66,18 @@ final class ClassMaker {
 			"org.tool.classMaker.input.reader.proto.ProtoClassesVisitor_A", // classesVisitor
 	};
 
+	protected static final String[] CASSANDRA_ARGS = new String[] {
+			"/Users/FuHuiyuan/Documents/cassandra_class.txt", // url
+			"org.tool.classMaker.generator.java.GeneratorFactory", // factory
+			"org.tool.classMaker.input.reader.cassandra.CassandraReader:a", // reader
+			"/Users/FuHuiyuan/IdeaProjects/template-service/src/main/java/", // output dir
+			"com.yinxiang.microservice.template.bean", // package
+			"org.tool.classMaker.input.stream.FileStreamProvider:.java:*", // inputProvider
+			"", // classesVisitor
+	};
+
 	public static void main(String[] args) {
-		args = args.length < DEFAULT_ARGS.length ? CSHARP_ARGS : args;
+		args = args.length < DEFAULT_ARGS.length ? CASSANDRA_ARGS : args;
 		
 		Maker maker = new Maker();
 		try {

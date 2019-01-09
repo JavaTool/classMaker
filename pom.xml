@@ -81,5 +81,10 @@
 		    <artifactId>jdom</artifactId>
 		    <version>1.0</version>
 		</dependency>
+	  <dependency>
+		  <groupId>com.datastax.cassandra</groupId>
+		  <artifactId>cassandra-driver-core</artifactId>
+		  <version>3.6.0</version>
+	  </dependency>
   </dependencies>
 </project>

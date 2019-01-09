@@ -22,9 +22,7 @@ public final class FileStreamProvider implements IInputStreamProvider {
 	private List<File> listFiles(File dir, String fileType, String[] pattens) {
 		List<File> files = Lists.newLinkedList();
 		Multimap<Integer, File> map = HashMultimap.create();
-		for (File file : dir.listFiles(file -> {
-			return file.isDirectory() || file.getName().endsWith(fileType);
-		})) {
+		for (File file : dir.listFiles(file -> file.isDirectory() || file.getName().endsWith(fileType))) {
 			if (file.isDirectory()) {
 				files.addAll(listFiles(file, fileType, pattens));
 			} else {
