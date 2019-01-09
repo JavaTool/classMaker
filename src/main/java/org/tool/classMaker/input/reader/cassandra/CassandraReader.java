@@ -14,6 +14,7 @@ import org.tool.classMaker.struct.IInterface;
 
 import java.util.List;
 import java.util.Properties;
+import java.util.UUID;
 
 public class CassandraReader extends LineReader {
 
@@ -156,8 +157,10 @@ public class CassandraReader extends LineReader {
 
         private static String getBaseType(String type) {
             switch (type.toLowerCase()) {
-                case "text" : case "varchar" : case "ascii" : case "inet" : case "timeuuid" : case "uuid" :
+                case "text" : case "varchar" : case "ascii" : case "inet" :
                     return "String";
+                case "timeuuid" : case "uuid" :
+                    return UUID.class.getName();
                 case "bigint" : case "timestamp" :
                     return "Long";
                 case "int" : case "counter" :
