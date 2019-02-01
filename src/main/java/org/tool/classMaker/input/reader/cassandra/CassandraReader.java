@@ -109,7 +109,7 @@ public class CassandraReader extends LineReader {
                 field.setAccess(Access.PRIVATE);
                 field.setName(Utils.firstLower(Utils._ToUppercase(fieldInfo.name)));
                 field.setAnnotations(Lists.newLinkedList());
-                field.getAnnotations().add(fieldInfo.isPrimaryKey() ? "PrimaryKey" : "Column(\"value=" + fieldInfo.name + "\")");
+                field.getAnnotations().add(fieldInfo.isPrimaryKey() ? "PrimaryKey" : "Column(value=\"" + fieldInfo.name + "\")");
                 cmClass.getFields().add(field);
                 if (!hasList && fieldInfo.isList()) {
                     importGroup.addImport(CMStructBuilder.createCMImport("java.util.List"));
