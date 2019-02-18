@@ -156,7 +156,7 @@ public class CassandraReader extends LineReader {
         }
 
         private static String getBaseType(String type) {
-            switch (type.toLowerCase()) {
+            switch (type.trim().toLowerCase()) {
                 case "text" : case "varchar" : case "ascii" : case "inet" :
                     return "String";
                 case "timeuuid" : case "uuid" :
