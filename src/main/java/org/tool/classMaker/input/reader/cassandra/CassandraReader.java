@@ -1,9 +1,6 @@
 package org.tool.classMaker.input.reader.cassandra;
 
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
-import com.datastax.driver.core.Session;
+import com.datastax.driver.core.*;
 import com.google.common.collect.*;
 import org.tool.classMaker.Utils;
 import org.tool.classMaker.input.reader.LineReader;
@@ -22,7 +19,11 @@ public class CassandraReader extends LineReader {
 
     private static final String KEY_TABLE = "table";
 
-    private static final String[] KEYS = {KEY_URL, KEY_TABLE};
+    private static final String KEY_USERNAME = "username";
+
+    private static final String KEY_PASSWORD = "password";
+
+    private static final String[] KEYS = {KEY_URL, KEY_USERNAME, KEY_PASSWORD, KEY_TABLE};
 
     private static final String COLUMN_TABLE = "table_name";
 
@@ -62,6 +63,7 @@ public class CassandraReader extends LineReader {
         try {
             cluster = Cluster.builder()
                     .addContactPoint(properties.getProperty(KEY_URL))
+                    .withAuthProvider(new PlainTextAuthProvider(properties.getProperty(KEY_USERNAME), properties.getProperty(KEY_PASSWORD)))
                     .build();
             Session session = cluster.connect();
             ResultSet rs = session.execute(SQL + properties.getProperty(KEY_TABLE) + "'");
