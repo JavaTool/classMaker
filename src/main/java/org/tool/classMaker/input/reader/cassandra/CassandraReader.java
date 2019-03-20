@@ -9,9 +9,7 @@ import org.tool.classMaker.struct.Access;
 import org.tool.classMaker.struct.IClasses;
 import org.tool.classMaker.struct.IInterface;
 
-import java.util.List;
-import java.util.Properties;
-import java.util.UUID;
+import java.util.*;
 
 public class CassandraReader extends LineReader {
 
@@ -110,17 +108,27 @@ public class CassandraReader extends LineReader {
                 field.setType(fieldInfo.getJavaType());
                 field.setAccess(Access.PRIVATE);
                 field.setName(Utils.firstLower(Utils._ToUppercase(fieldInfo.name)));
+                if (fieldInfo.isList()) {
+                    field.setDefaultValue("Lists.newLinkedList()");
+                } else if (fieldInfo.isSet()) {
+                    field.setDefaultValue("Sets.newHashSet()");
+                } else if (fieldInfo.isMap()) {
+                    field.setDefaultValue("Maps.newHashMap()");
+                }
                 field.setAnnotations(Lists.newLinkedList());
                 field.getAnnotations().add(fieldInfo.isPrimaryKey() ? "PrimaryKey" : "Column(value=\"" + fieldInfo.name + "\")");
                 cmClass.getFields().add(field);
                 if (!hasList && fieldInfo.isList()) {
-                    importGroup.addImport(CMStructBuilder.createCMImport("java.util.List"));
+                    importGroup.addImport(CMStructBuilder.createCMImport(List.class.getName()));
+                    importGroup.addImport(CMStructBuilder.createCMImport(Lists.class.getName()));
                     hasList = true;
                 } else if (!hasSet && fieldInfo.isSet()) {
-                    importGroup.addImport(CMStructBuilder.createCMImport("java.util.Set"));
+                    importGroup.addImport(CMStructBuilder.createCMImport(Set.class.getName()));
+                    importGroup.addImport(CMStructBuilder.createCMImport(Sets.class.getName()));
                     hasSet = true;
                 } else if (!hasMap && fieldInfo.isMap()) {
-                    importGroup.addImport(CMStructBuilder.createCMImport("java.util.Map"));
+                    importGroup.addImport(CMStructBuilder.createCMImport(Map.class.getName()));
+                    importGroup.addImport(CMStructBuilder.createCMImport(Maps.class.getName()));
                     hasMap = true;
                 }
                 cmClass.getMethods().add(CMStructBuilder.createGetter(field));
