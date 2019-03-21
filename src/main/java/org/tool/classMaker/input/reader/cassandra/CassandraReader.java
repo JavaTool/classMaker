@@ -1,5 +1,6 @@
 package org.tool.classMaker.input.reader.cassandra;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.datastax.driver.core.*;
 import com.google.common.collect.*;
 import org.tool.classMaker.Utils;
@@ -99,6 +100,7 @@ public class CassandraReader extends LineReader {
             importGroup.addImport(CMStructBuilder.createCMImport("org.springframework.data.cassandra.core.mapping.Column"));
             importGroup.addImport(CMStructBuilder.createCMImport("org.springframework.data.cassandra.core.mapping.PrimaryKey"));
             importGroup.addImport(CMStructBuilder.createCMImport("org.springframework.data.cassandra.core.mapping.Table"));
+            importGroup.addImport(CMStructBuilder.createCMImport(JSONField.class.getName()));
             cmClass.setImportGroup(importGroup);
             boolean hasList = false, hasSet = false, hasMap = false;
             for (FieldInfo fieldInfo : list) {
@@ -117,6 +119,7 @@ public class CassandraReader extends LineReader {
                 }
                 field.setAnnotations(Lists.newLinkedList());
                 field.getAnnotations().add(fieldInfo.isPrimaryKey() ? "PrimaryKey" : "Column(value=\"" + fieldInfo.name + "\")");
+                field.getAnnotations().add("JSONField(name=\"" + fieldInfo.name + "\")");
                 cmClass.getFields().add(field);
                 if (!hasList && fieldInfo.isList()) {
                     importGroup.addImport(CMStructBuilder.createCMImport(List.class.getName()));
